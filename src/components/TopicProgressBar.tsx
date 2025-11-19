@@ -2,6 +2,7 @@ import { Progress } from "./ui/progress";
 import { CheckCircle2, BookOpen } from "lucide-react";
 import { getTopicProgress } from "../utils/progressTracker";
 import { useEffect, useState } from "react";
+import React from "react";
 
 interface TopicProgressBarProps {
   topicId: string;

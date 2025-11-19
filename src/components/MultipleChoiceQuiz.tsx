@@ -3,6 +3,7 @@ import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { addQuizScore } from "../utils/progressTracker";
+import React from "react";
 
 interface MultipleChoiceQuizProps {
   lessonId?: string;

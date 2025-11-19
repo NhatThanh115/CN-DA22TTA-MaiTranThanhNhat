@@ -5,6 +5,7 @@ import { Textarea } from "./ui/textarea";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { MessageSquare, Flag, ThumbsUp, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
+import React from "react";
 
 interface Comment {
   id: string;

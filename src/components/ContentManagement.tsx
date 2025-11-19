@@ -1,40 +1,42 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { toast } from "sonner";
+import { courses, topics, type Course } from "../data/courses";
 import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Textarea } from "./ui/textarea";
 import { Card } from "./ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Textarea } from "./ui/textarea";
+import { Badge } from "./ui/badge";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
 } from "./ui/select";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "./ui/dialog";
-import { Label } from "./ui/label";
-import { Badge } from "./ui/badge";
-import { 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Search, 
-  BookOpen, 
-  Video, 
-  Music, 
+import {
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+  BookOpen,
   FileText,
+  Video,
+  Music,
   GripVertical,
   Save,
   X
 } from "lucide-react";
-import { useTranslation } from 'react-i18next';
-import { toast } from "sonner";
+import React from 'react';
 
 interface Lesson {
   id: string;
@@ -48,6 +50,8 @@ interface Lesson {
   exercises: Exercise[];
   order: number;
   status: 'draft' | 'published';
+  courseId?: string; // Added course assignment
+  topicId?: string;  // Added topic assignment
   createdAt: string;
   updatedAt: string;
 }
@@ -63,9 +67,10 @@ interface Exercise {
 
 interface ContentManagementProps {
   currentUser: { username: string; email?: string; role?: string };
+  onNavigate?: (view: string) => void;
 }
 
-export function ContentManagement({ currentUser }: ContentManagementProps) {
+export function ContentManagement({ currentUser, onNavigate }: ContentManagementProps) {
   const { t } = useTranslation();
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -76,6 +81,7 @@ export function ContentManagement({ currentUser }: ContentManagementProps) {
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
   const [editingExercise, setEditingExercise] = useState<Exercise | null>(null);
   const [currentLessonForExercise, setCurrentLessonForExercise] = useState<string | null>(null);
+  const [isCreatingNewTopic, setIsCreatingNewTopic] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -86,8 +92,25 @@ export function ContentManagement({ currentUser }: ContentManagementProps) {
     content: '',
     videoUrl: '',
     audioUrl: '',
+    courseId: '',
+    topicId: '',
     status: 'draft' as 'draft' | 'published'
   });
+
+  // New topic form data
+  const [newTopicData, setNewTopicData] = useState({
+    name: '',
+    description: '',
+    icon: '📚'
+  });
+
+  // Get available topics based on selected course
+  const availableTopics = formData.courseId
+    ? topics.filter(topic => {
+        const course = courses.find(c => c.id === formData.courseId);
+        return course?.topics.some(t => t.id === topic.id);
+      })
+    : [];
 
   const [exerciseFormData, setExerciseFormData] = useState({
     type: 'multiple-choice' as Exercise['type'],
@@ -115,7 +138,14 @@ export function ContentManagement({ currentUser }: ContentManagementProps) {
   const filteredLessons = lessons.filter(lesson => {
     const matchesSearch = lesson.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          lesson.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesDifficulty = difficultyFilter === "all" || lesson.difficulty === difficultyFilter;
+    
+    // Filter by course difficulty instead of lesson difficulty
+    let matchesDifficulty = difficultyFilter === "all";
+    if (!matchesDifficulty && lesson.courseId) {
+      const course = courses.find(c => c.id === lesson.courseId);
+      matchesDifficulty = course?.level === difficultyFilter;
+    }
+    
     const matchesType = typeFilter === "all" || lesson.type === typeFilter;
     return matchesSearch && matchesDifficulty && matchesType;
   });
@@ -213,6 +243,8 @@ export function ContentManagement({ currentUser }: ContentManagementProps) {
       content: '',
       videoUrl: '',
       audioUrl: '',
+      courseId: '',
+      topicId: '',
       status: 'draft'
     });
     setEditingLesson(null);
@@ -241,6 +273,8 @@ export function ContentManagement({ currentUser }: ContentManagementProps) {
       content: lesson.content,
       videoUrl: lesson.videoUrl || '',
       audioUrl: lesson.audioUrl || '',
+      courseId: lesson.courseId || '',
+      topicId: lesson.topicId || '',
       status: lesson.status
     });
     setShowLessonDialog(true);
@@ -270,16 +304,22 @@ export function ContentManagement({ currentUser }: ContentManagementProps) {
           <h2 className="text-2xl mb-1">{t('admin.content.lessonManagement')}</h2>
           <p className="text-gray-600">{t('admin.content.lessonManagementDesc')}</p>
         </div>
-        <Button
-          onClick={() => {
-            resetForm();
-            setShowLessonDialog(true);
-          }}
-          className="bg-[#225d9c] hover:bg-[#1a4a7a] border-2 border-[#225d9c]"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          {t('admin.content.createLesson')}
-        </Button>
+        <div className="flex gap-3">
+          <Button
+            onClick={() => onNavigate?.('create-topic')}
+            className="bg-[#288f8a] hover:bg-[#1f7a73] border-2 border-[#288f8a]"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Create Topic
+          </Button>
+          <Button
+            onClick={() => onNavigate?.('create-lesson')}
+            className="bg-[#225d9c] hover:bg-[#1a4a7a] border-2 border-[#225d9c]"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            {t('admin.content.createLesson')}
+          </Button>
+        </div>
       </div>
 
       {/* Search and Filters */}
@@ -347,7 +387,12 @@ export function ContentManagement({ currentUser }: ContentManagementProps) {
 
       {/* Lessons List */}
       <div className="grid grid-cols-1 gap-4">
-        {filteredLessons.map((lesson) => (
+        {filteredLessons.map((lesson) => {
+          // Get course and topic info
+          const lessonCourse = courses.find(c => c.id === lesson.courseId);
+          const lessonTopic = topics.find(t => t.id === lesson.topicId);
+          
+          return (
           <Card key={lesson.id} className="p-6 border-2 border-gray-200 hover:border-[#225d9c] transition-colors">
             <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
               <div className="flex-1">
@@ -356,15 +401,28 @@ export function ContentManagement({ currentUser }: ContentManagementProps) {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="text-xl">{lesson.title}</h3>
-                      <Badge className={`border ${getDifficultyColor(lesson.difficulty)}`}>
-                        {lesson.difficulty}
-                      </Badge>
+                      {lessonCourse && (
+                        <Badge className={`border ${getDifficultyColor(lessonCourse.level)}`}>
+                          {lessonCourse.level}
+                        </Badge>
+                      )}
                       <Badge className={`border ${getStatusColor(lesson.status)}`}>
                         {t(`admin.content.${lesson.status}`)}
                       </Badge>
                     </div>
                     <p className="text-gray-600 mb-3">{lesson.description}</p>
                     <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                      {lessonCourse && (
+                        <span className="flex items-center gap-1">
+                          <BookOpen className="w-4 h-4" />
+                          {lessonCourse.title}
+                        </span>
+                      )}
+                      {lessonTopic && (
+                        <span>
+                          {lessonTopic.icon} {lessonTopic.name}
+                        </span>
+                      )}
                       <span className="flex items-center gap-1">
                         <FileText className="w-4 h-4" />
                         {t(`admin.content.types.${lesson.type}`)}
@@ -468,7 +526,8 @@ export function ContentManagement({ currentUser }: ContentManagementProps) {
               </div>
             )}
           </Card>
-        ))}
+          );
+        })}
       </div>
 
       {/* Create/Edit Lesson Dialog */}
@@ -510,19 +569,19 @@ export function ContentManagement({ currentUser }: ContentManagementProps) {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>{t('admin.content.difficulty')}</Label>
+                <Label>{t('admin.content.course')}</Label>
                 <Select
-                  value={formData.difficulty}
-                  onValueChange={(value: 'A1' | 'A2' | 'B1' | 'B2') => setFormData({ ...formData, difficulty: value })}
-                >
+                  value={formData.courseId}
+                  onValueChange={(value) => setFormData({ ...formData, courseId: value, topicId: '' })}>
                   <SelectTrigger className="border-2">
-                    <SelectValue />
+                    <SelectValue placeholder={t('admin.content.selectCourse')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="A1">A1 - Beginner</SelectItem>
-                    <SelectItem value="A2">A2 - Elementary</SelectItem>
-                    <SelectItem value="B1">B1 - Intermediate</SelectItem>
-                    <SelectItem value="B2">B2 - Upper Intermediate</SelectItem>
+                    {courses.map((course) => (
+                      <SelectItem key={course.id} value={course.id}>
+                        {course.title}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -546,6 +605,95 @@ export function ContentManagement({ currentUser }: ContentManagementProps) {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+
+            {/* Topic Section */}
+            <div className="space-y-4 p-4 border-2 border-[#288f8a] rounded-lg bg-[#288f8a]/5">
+              <div className="flex items-center justify-between">
+                <Label className="text-base">{t('admin.content.topicSection')}</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setIsCreatingNewTopic(!isCreatingNewTopic);
+                    if (!isCreatingNewTopic) {
+                      setFormData({ ...formData, topicId: '' });
+                    } else {
+                      setNewTopicData({ name: '', description: '', icon: '📚' });
+                    }
+                  }}
+                  className="border-2"
+                  disabled={!formData.courseId}
+                >
+                  {isCreatingNewTopic ? t('admin.content.selectExistingTopic') : t('admin.content.createNewTopic')}
+                </Button>
+              </div>
+
+              {!formData.courseId && (
+                <p className="text-sm text-gray-500 italic">
+                  {t('admin.content.selectCourseFirst')}
+                </p>
+              )}
+
+              {formData.courseId && !isCreatingNewTopic && (
+                <div>
+                  <Label>{t('admin.content.existingTopic')}</Label>
+                  <Select
+                    value={formData.topicId}
+                    onValueChange={(value) => setFormData({ ...formData, topicId: value })}
+                  >
+                    <SelectTrigger className="border-2">
+                      <SelectValue placeholder={t('admin.content.selectTopic')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableTopics.map((topic) => (
+                        <SelectItem key={topic.id} value={topic.id}>
+                          {topic.icon} {topic.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {formData.courseId && isCreatingNewTopic && (
+                <div className="space-y-3">
+                  <div>
+                    <Label htmlFor="topicName">{t('admin.content.topicName')} *</Label>
+                    <Input
+                      id="topicName"
+                      value={newTopicData.name}
+                      onChange={(e) => setNewTopicData({ ...newTopicData, name: e.target.value })}
+                      className="border-2"
+                      placeholder={t('admin.content.topicNamePlaceholder')}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="topicDescription">{t('admin.content.topicDescription')} *</Label>
+                    <Textarea
+                      id="topicDescription"
+                      value={newTopicData.description}
+                      onChange={(e) => setNewTopicData({ ...newTopicData, description: e.target.value })}
+                      className="border-2"
+                      rows={2}
+                      placeholder={t('admin.content.topicDescriptionPlaceholder')}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="topicIcon">{t('admin.content.topicIcon')}</Label>
+                    <Input
+                      id="topicIcon"
+                      value={newTopicData.icon}
+                      onChange={(e) => setNewTopicData({ ...newTopicData, icon: e.target.value })}
+                      className="border-2"
+                      placeholder="📚"
+                      maxLength={2}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">{t('admin.content.topicIconHint')}</p>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div>

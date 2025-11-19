@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Card } from "./ui/card";
-import { lessons, topics, courses, getCourseLessons } from "../data/lessons";
+import { Button } from "./ui/button";
+import { lessons, topics, courses, getCourseLessons } from "../data/courses";
 import { getUserProgress, updateAllTopicProgress, getCompletionPercentage } from "../utils/progressTracker";
 import { 
   TrendingUp, 
@@ -13,6 +13,7 @@ import {
   BookOpen
 } from "lucide-react";
 import { useTranslation } from 'react-i18next';
+import React from "react";
 
 interface DashboardHomeProps {
   user: { username: string; email?: string } | null;
@@ -51,7 +52,8 @@ export function DashboardHome({ user, onNavigate }: DashboardHomeProps) {
   // Calculate progress for each course
   const coursesWithProgress = courses.map(course => {
     const courseLessons = getCourseLessons(course.id);
-    const completed = courseLessons.filter(id => progress.completedLessons.includes(id)).length;
+    const lessonIds = courseLessons.map(l => l.id);
+    const completed = lessonIds.filter(id => progress.completedLessons.includes(id)).length;
     return {
       ...course,
       totalLessons: courseLessons.length,
@@ -61,7 +63,7 @@ export function DashboardHome({ user, onNavigate }: DashboardHomeProps) {
   });
 
   // Find current course (course with progress but not completed)
-  const currentCourse = coursesWithProgress.find(course => 
+  const currentCourse = coursesWithProgress.find(course =>
     course.completed > 0 && course.completed < course.totalLessons
   ) || coursesWithProgress[0]; // Default to A1 if no progress
 
@@ -70,12 +72,12 @@ export function DashboardHome({ user, onNavigate }: DashboardHomeProps) {
   // Find next lesson to continue
   const getNextLesson = () => {
     const courseLessons = getCourseLessons(currentCourse.id);
-    for (const lessonId of courseLessons) {
-      if (!progress.completedLessons.includes(lessonId)) {
-        return lessonId;
+    for (const lesson of courseLessons) {
+      if (!progress.completedLessons.includes(lesson.id)) {
+        return lesson.id;
       }
     }
-    return courseLessons[0]; // Default to first lesson
+    return courseLessons[0]?.id; // Default to first lesson
   };
 
   return (
@@ -86,7 +88,7 @@ export function DashboardHome({ user, onNavigate }: DashboardHomeProps) {
           {t('dashboard.welcome')}, {user ? user.username : 'Guest'}! 👋
         </h1>
         <p className="text-muted-foreground">
-          You're currently learning at {currentLevel} level
+          {t('dashboard.currentLevel')} {currentLevel} {t('dashboard.level')}
         </p>
       </div>
 
@@ -94,7 +96,7 @@ export function DashboardHome({ user, onNavigate }: DashboardHomeProps) {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-5 border-2 shadow-sm hover:shadow-md transition-shadow bg-white">
           <div className="flex items-start justify-between mb-3">
-            <p className="text-sm text-muted-foreground">Total Progress</p>
+            <p className="text-sm text-muted-foreground">{t('dashboard.stats.totalProgress')}</p>
             <div className="bg-blue-50 p-2 rounded-lg">
               <TrendingUp className="w-5 h-5 text-[#225d9c]" />
             </div>
@@ -127,27 +129,27 @@ export function DashboardHome({ user, onNavigate }: DashboardHomeProps) {
 
         <Card className="p-5 border-2 shadow-sm hover:shadow-md transition-shadow bg-white">
           <div className="flex items-start justify-between mb-3">
-            <p className="text-sm text-muted-foreground">Points Earned</p>
+            <p className="text-sm text-muted-foreground">{t('dashboard.stats.pointsEarned')}</p>
             <div className="bg-yellow-50 p-2 rounded-lg">
               <Trophy className="w-5 h-5 text-[#e8c02e]" />
             </div>
           </div>
           <div>
             <p className="text-3xl">{points}</p>
-            <p className="text-xs text-muted-foreground mt-2">Keep it up!</p>
+            <p className="text-xs text-muted-foreground mt-2">{t('dashboard.stats.keepItUp')}</p>
           </div>
         </Card>
 
         <Card className="p-5 border-2 shadow-sm hover:shadow-md transition-shadow bg-white">
           <div className="flex items-start justify-between mb-3">
-            <p className="text-sm text-muted-foreground">Badges</p>
+            <p className="text-sm text-muted-foreground">{t('dashboard.stats.badges')}</p>
             <div className="bg-teal-50 p-2 rounded-lg">
               <Award className="w-5 h-5 text-[#288f8a]" />
             </div>
           </div>
           <div>
             <p className="text-3xl">{badges}</p>
-            <p className="text-xs text-muted-foreground mt-2">achievements</p>
+            <p className="text-xs text-muted-foreground mt-2">{t('dashboard.stats.achievements')}</p>
           </div>
         </Card>
       </div>
@@ -157,12 +159,12 @@ export function DashboardHome({ user, onNavigate }: DashboardHomeProps) {
         <div className="p-6 md:p-8 relative">
           <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex-1">
-              <p className="text-sm text-white/90 mb-1">Continue where you left off</p>
-              <h2 className="text-white mb-2">{currentCourse.title}</h2>
+              <p className="text-sm text-white/90 mb-1">{t('dashboard.continueLearning.title')}</p>
+              <h2 className="text-white mb-2">{t(currentCourse.titleKey)}</h2>
               <div className="flex items-center gap-3 mb-0 md:mb-0">
                 <div className="flex-1 max-w-sm">
                   <div className="flex justify-between text-sm mb-2">
-                    <span>Progress: {currentCourseProgress}%</span>
+                    <span>{t('dashboard.continueLearning.progress')}: {currentCourseProgress}%</span>
                   </div>
                   <div className="bg-white/20 rounded-full h-2 overflow-hidden">
                     <div 
@@ -186,9 +188,9 @@ export function DashboardHome({ user, onNavigate }: DashboardHomeProps) {
       {/* Your Courses Section */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2>Your Courses</h2>
+          <h2>{t('dashboard.courses')}</h2>
           <Button variant="ghost" className="text-[#225d9c]">
-            View All Courses
+            {t('dashboard.viewAll')}
           </Button>
         </div>
 
@@ -207,7 +209,7 @@ export function DashboardHome({ user, onNavigate }: DashboardHomeProps) {
                 {isRecommended && (
                   <div className="mb-3">
                     <Badge variant="secondary" className="bg-blue-100 text-blue-700 border-blue-300 text-xs">
-                      Recommended for You
+                      {t('dashboard.recommended')}
                     </Badge>
                   </div>
                 )}
@@ -218,15 +220,15 @@ export function DashboardHome({ user, onNavigate }: DashboardHomeProps) {
                   </Badge>
                 </div>
 
-                <h3 className="mb-2">{course.title}</h3>
+                <h3 className="mb-2">{t(course.titleKey)}</h3>
                 <p className="text-sm text-muted-foreground mb-5 leading-relaxed">
-                  {course.description}
+                  {t(course.descriptionKey)}
                 </p>
 
                 <div className="space-y-4 mb-5">
                   <div>
                     <div className="flex justify-between text-sm mb-2">
-                      <span className="text-muted-foreground">Progress</span>
+                      <span className="text-muted-foreground">{t('dashboard.progress')}</span>
                       <span className="text-sm">{course.progress}%</span>
                     </div>
                     <div className="bg-gray-200 rounded-full h-2 overflow-hidden">
@@ -240,11 +242,11 @@ export function DashboardHome({ user, onNavigate }: DashboardHomeProps) {
                   <div className="flex items-center justify-between text-sm text-muted-foreground pt-1">
                     <div className="flex items-center gap-1.5">
                       <Clock className="w-4 h-4" />
-                      <span>~{course.estimatedHours} hours</span>
+                      <span>~{course.estimatedHours} {t('dashboard.hours')}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <BookOpen className="w-4 h-4" />
-                      <span>{course.topics.length} topics</span>
+                      <span>{course.topics.length} {t('dashboard.topics')}</span>
                     </div>
                   </div>
                 </div>
@@ -261,7 +263,7 @@ export function DashboardHome({ user, onNavigate }: DashboardHomeProps) {
                       : 'border-2 hover:bg-gray-50'
                   }`}
                 >
-                  {isStarted ? 'Continue Course' : 'Start Course'}
+                  {isStarted ? t('dashboard.continueCourse') : t('dashboard.start')}
                 </Button>
               </Card>
             );

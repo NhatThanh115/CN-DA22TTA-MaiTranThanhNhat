@@ -1,4 +1,4 @@
-import { topics } from "../data/lessons";
+import { topics } from "../data/courses";
 
 // Find which topic a lesson belongs to
 export function findTopicByLessonId(lessonId: string): {
@@ -7,11 +7,11 @@ export function findTopicByLessonId(lessonId: string): {
   topicLessons: string[];
 } | null {
   for (const topic of topics) {
-    if (topic.lessons.includes(lessonId)) {
+    if (topic.lessons.some(l => l.id === lessonId)) {
       return {
         topicId: topic.id,
         topicName: topic.name,
-        topicLessons: topic.lessons,
+        topicLessons: topic.lessons.map(l => l.id),
       };
     }
   }

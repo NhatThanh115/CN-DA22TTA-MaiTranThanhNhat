@@ -1,6 +1,6 @@
 import { Card } from "./ui/card";
 import { TopicProgressBar } from "./TopicProgressBar";
-import { topics } from "../data/lessons";
+import { topics } from "../data/courses";
 import { getUserProgress, updateAllTopicProgress } from "../utils/progressTracker";
 import { useEffect, useState } from "react";
 import { Trophy, Target, TrendingUp } from "lucide-react";

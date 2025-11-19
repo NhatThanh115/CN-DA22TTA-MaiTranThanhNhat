@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Card } from "./ui/card";
@@ -18,7 +18,7 @@ import {
   DialogFooter,
 } from "./ui/dialog";
 import { Badge } from "./ui/badge";
-import { Search, Filter, BarChart3, Shield, Ban, CheckCircle, Eye } from "lucide-react";
+import { Search, BarChart3, Shield, Ban, CheckCircle, Eye } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 import { toast } from "sonner";
 
@@ -125,9 +125,9 @@ export function UserManagement({ currentUser }: UserManagementProps) {
   const toggleUserStatus = (userId: string) => {
     const updatedUsers = users.map(user => {
       if (user.id === userId) {
-        const newStatus = user.status === 'active' ? 'inactive' : 'active';
+        const newStatus: 'active' | 'inactive' = user.status === 'active' ? 'inactive' : 'active';
         toast.success(
-          newStatus === 'active' 
+          newStatus === 'active'
             ? t('admin.users.activated', { username: user.username })
             : t('admin.users.deactivated', { username: user.username })
         );

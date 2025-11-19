@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
-import { Card } from "./ui/card";
+import { toast } from "sonner";
+import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
+import { Card } from "./ui/card";
+import type { DifficultyLevel } from "../data/courses";
+import { getTopicByLessonId, getPreviousLesson, getNextLesson } from "../data/courses";
+import { isLessonCompleted, markLessonComplete } from "../utils/progressTracker";
+import { CheckCircle2, Award, ChevronLeft, ChevronRight } from "lucide-react";
+import { LessonMedia } from "./LessonMedia";
 import { MultipleChoiceQuiz } from "./MultipleChoiceQuiz";
 import { CommentSection } from "./CommentSection";
-import { LessonMedia } from "./LessonMedia";
-import { CheckCircle2, Award } from "lucide-react";
-import { markLessonComplete, isLessonCompleted } from "../utils/progressTracker";
-import { findTopicByLessonId } from "../utils/lessonHelpers";
-import { toast } from "sonner@2.0.3";
-import { Badge } from "./ui/badge";
-import type { DifficultyLevel } from "../data/lessons";
+import React from "react";
 
 interface Example {
   sentence: string;
@@ -37,6 +38,7 @@ interface TopicLessonProps {
     correctAnswer: number;
     explanation: string;
   };
+  onNavigate?: (lessonId: string) => void;
 }
 
 const getDifficultyInfo = (level: DifficultyLevel) => {
@@ -57,10 +59,15 @@ export function TopicLesson({
   keyPoints,
   media, 
   examples, 
-  practiceExercise 
+  practiceExercise,
+  onNavigate
 }: TopicLessonProps) {
   const [completed, setCompleted] = useState(false);
   const [startTime] = useState(Date.now());
+  
+  // Get previous and next lessons
+  const previousLesson = lessonId ? getPreviousLesson(lessonId) : undefined;
+  const nextLesson = lessonId ? getNextLesson(lessonId) : undefined;
 
   useEffect(() => {
     if (lessonId) {
@@ -78,13 +85,29 @@ export function TopicLesson({
 
   const handleMarkComplete = () => {
     if (lessonId && !completed) {
-      const topicInfo = findTopicByLessonId(lessonId);
+      const topic = getTopicByLessonId(lessonId);
       
-      if (topicInfo) {
-        markLessonComplete(lessonId, topicInfo.topicId, topicInfo.topicLessons);
+      if (topic) {
+        // Extract lesson IDs from the topic's lessons array
+        const lessonIds = topic.lessons.map(lesson => lesson.id);
+        markLessonComplete(lessonId, topic.id, lessonIds);
         setCompleted(true);
         toast.success("Lesson completed! Great job! 🎉");
       }
+    }
+  };
+
+  const handlePrevious = () => {
+    if (previousLesson && onNavigate) {
+      onNavigate(previousLesson.id);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleNext = () => {
+    if (nextLesson && onNavigate) {
+      onNavigate(nextLesson.id);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -164,25 +187,36 @@ export function TopicLesson({
       )}
 
       {/* Navigation */}
-      <div className="flex justify-between items-center pt-6 border-t gap-4">
-        <button className="px-6 py-2 bg-secondary text-white rounded hover:opacity-90 transition-opacity">
-          ← Previous
-        </button>
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center pt-6 border-t gap-4">
+        <Button
+          onClick={handlePrevious}
+          disabled={!previousLesson}
+          variant="outline"
+          className="border-2 border-[#288f8a] text-[#288f8a] hover:bg-[#288f8a] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          <ChevronLeft className="w-4 h-4 mr-2" />
+          Previous
+        </Button>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           {lessonId && (
             <Button
               onClick={handleMarkComplete}
               disabled={completed}
               variant={completed ? "outline" : "default"}
-              className={completed ? "border-green-500 text-green-700" : "bg-[#288f8a] hover:bg-[#236f6b] text-white"}
+              className={completed ? "border-2 border-green-500 text-green-700 hover:bg-green-50" : "bg-[#288f8a] hover:bg-[#236f6b] text-white transition-colors"}
             >
               <CheckCircle2 className="w-4 h-4 mr-2" />
               {completed ? "Completed" : "Mark as Complete"}
             </Button>
           )}
-          <button className="px-6 py-2 bg-secondary text-white rounded hover:opacity-90 transition-opacity">
-            Next →
-          </button>
+          <Button
+            onClick={handleNext}
+            disabled={!nextLesson}
+            className="bg-[#288f8a] hover:bg-[#236f6b] text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            Next
+            <ChevronRight className="w-4 h-4 ml-2" />
+          </Button>
         </div>
       </div>
 

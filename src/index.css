@@ -25,11 +25,6 @@
       --tw-leading: initial;
       --tw-font-weight: initial;
       --tw-tracking: initial;
-      --tw-ordinal: initial;
-      --tw-slashed-zero: initial;
-      --tw-numeric-figure: initial;
-      --tw-numeric-spacing: initial;
-      --tw-numeric-fraction: initial;
       --tw-shadow: 0 0 #0000;
       --tw-shadow-color: initial;
       --tw-shadow-alpha: 100%;
@@ -1647,6 +1642,10 @@
     background-color: #288f8a;
   }
 
+  .bg-\[\#288f8a\]\/5 {
+    background-color: oklab(59.2053% -.0896782 -.016122 / .05);
+  }
+
   .bg-\[\#d4edda\] {
     background-color: #d4edda;
   }
@@ -2523,9 +2522,8 @@
     text-transform: uppercase;
   }
 
-  .ordinal {
-    --tw-ordinal: ordinal;
-    font-variant-numeric: var(--tw-ordinal, ) var(--tw-slashed-zero, ) var(--tw-numeric-figure, ) var(--tw-numeric-spacing, ) var(--tw-numeric-fraction, );
+  .italic {
+    font-style: italic;
   }
 
   .underline-offset-4 {
@@ -2682,6 +2680,10 @@
   .select-none {
     -webkit-user-select: none;
     user-select: none;
+  }
+
+  .running {
+    animation-play-state: running;
   }
 
   @media (hover: hover) {
@@ -3955,31 +3957,6 @@ html {
 }
 
 @property --tw-tracking {
-  syntax: "*";
-  inherits: false
-}
-
-@property --tw-ordinal {
-  syntax: "*";
-  inherits: false
-}
-
-@property --tw-slashed-zero {
-  syntax: "*";
-  inherits: false
-}
-
-@property --tw-numeric-figure {
-  syntax: "*";
-  inherits: false
-}
-
-@property --tw-numeric-spacing {
-  syntax: "*";
-  inherits: false
-}
-
-@property --tw-numeric-fraction {
   syntax: "*";
   inherits: false
 }

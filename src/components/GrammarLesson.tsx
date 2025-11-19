@@ -4,6 +4,7 @@ import { Button } from "./ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Badge } from "./ui/badge";
 import { CheckCircle2 } from "lucide-react";
+import React from "react";
 
 interface Exercise {
   sentence: string;
@@ -106,7 +107,6 @@ export function GrammarLesson() {
             </div>
 
             {exercises.map((exercise, index) => {
-              const isCorrect = checked && answers[index] === exercise.correctAnswer;
               const isIncorrect = checked && answers[index] && answers[index] !== exercise.correctAnswer;
 
               return (

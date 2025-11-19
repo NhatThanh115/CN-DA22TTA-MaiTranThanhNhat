@@ -1,3 +1,4 @@
+import React from "react";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { Progress } from "./ui/progress";
 import { Trophy, BookOpen, Mic, Headphones } from "lucide-react";

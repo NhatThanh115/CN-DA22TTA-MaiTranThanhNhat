@@ -1,36 +1,31 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card } from './ui/card';
+import { getUserProfile, updateUserProfile, UserProfile } from '../utils/userProfile';
+import { getUserProgress } from '../utils/progressTracker';
+import { lessons, topics, courses } from '../data/courses';
+import { toast } from 'sonner';
 import { Button } from './ui/button';
+import { Card } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Progress } from './ui/progress';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from './ui/select';
-import { 
-  UserCircle, 
-  Mail, 
-  Phone, 
-  Calendar, 
-  Edit2, 
-  Save, 
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import {
+  Mail,
+  Phone,
+  Calendar,
+  Save,
   X,
-  Trophy,
+  Award,
   BookOpen,
-  Flame,
   Clock,
-  BarChart3,
-  Award
+  Trophy,
+  UserCircle,
+  Edit2,
+  Flame,
+  BarChart3
 } from 'lucide-react';
-import { getUserProfile, updateUserProfile, UserProfile } from '../utils/userProfile';
-import { getUserProgress } from '../utils/progressTracker';
-import { lessons, topics, courses } from '../data/lessons';
-import { toast } from 'sonner@2.0.3';
+import React from 'react';
 
 interface AccountPageProps {
   user: { username: string; email?: string } | null;
@@ -413,11 +408,9 @@ export function AccountPage({ user }: AccountPageProps) {
             {courses.map((course) => {
               // Calculate course completion
               const courseLessons: string[] = [];
-              course.topics.forEach(topicId => {
-                const topic = topics.find(t => t.id === topicId);
-                if (topic) {
-                  courseLessons.push(...topic.lessons);
-                }
+              course.topics.forEach(topic => {
+                // topic is already a Topic object with lessons array
+                courseLessons.push(...topic.lessons.map(lesson => lesson.id));
               });
               
               const courseCompleted = courseLessons.filter(lessonId => 
@@ -432,7 +425,7 @@ export function AccountPage({ user }: AccountPageProps) {
                 <Card key={course.id} className="p-4 border-2">
                   <div className="flex items-center justify-between mb-2">
                     <div>
-                      <h4 className="text-sm">{course.name}</h4>
+                      <h4 className="text-sm">{t(course.titleKey)}</h4>
                       <p className="text-xs text-muted-foreground">{course.level}</p>
                     </div>
                     <span className="text-lg">{coursePercentage}%</span>

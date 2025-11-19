@@ -1,21 +1,16 @@
 import { motion } from "motion/react";
 import { Button } from "./ui/button";
 import { LanguageSwitcher } from "./LanguageSwitcher";
-import { 
-  Languages, 
+import {
+  Languages,
   BookOpen,
   Trophy,
   Zap,
   Users,
-  Star,
-  Globe,
-  CheckCircle2,
-  Sparkles,
-  ArrowRight,
-  TrendingUp,
-  Target
+  ArrowRight
 } from "lucide-react";
 import { useTranslation } from 'react-i18next';
+import React from "react";
 
 interface WelcomePageProps {
   onNavigateToLogin: () => void;

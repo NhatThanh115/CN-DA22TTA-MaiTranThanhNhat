@@ -4,12 +4,14 @@ import { UserManagement } from "./UserManagement";
 import { ContentManagement } from "./ContentManagement";
 import { Users, BookOpen, Shield } from "lucide-react";
 import { useTranslation } from 'react-i18next';
+import React from "react";
 
 interface AdminPageProps {
   currentUser: { username: string; email?: string; role?: string };
+  onNavigate?: (view: string) => void;
 }
 
-export function AdminPage({ currentUser }: AdminPageProps) {
+export function AdminPage({ currentUser, onNavigate }: AdminPageProps) {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("users");
 
@@ -59,7 +61,7 @@ export function AdminPage({ currentUser }: AdminPageProps) {
           </TabsContent>
 
           <TabsContent value="content">
-            <ContentManagement currentUser={currentUser} />
+            <ContentManagement currentUser={currentUser} onNavigate={onNavigate} />
           </TabsContent>
         </Tabs>
       </div>

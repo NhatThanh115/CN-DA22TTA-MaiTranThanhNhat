@@ -2,15 +2,13 @@ import { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Card } from "./ui/card";
-import { 
-  courses, 
-  topics, 
-  lessons, 
-  getCourseById, 
-  getTopicById,
-  getCourseLessons 
-} from "../data/lessons";
+import {
+  getCourseById,
+  getCourseLessons,
+  topics
+} from "../data/courses";
 import { getUserProgress, updateAllTopicProgress } from "../utils/progressTracker";
+import { useTranslation } from 'react-i18next';
 import { 
   ArrowLeft,
   BookOpen,
@@ -20,6 +18,7 @@ import {
   Target,
   GraduationCap
 } from "lucide-react";
+import React from "react";
 
 interface CourseViewProps {
   courseId: string;
@@ -28,6 +27,7 @@ interface CourseViewProps {
 }
 
 export function CourseView({ courseId, onNavigate, onBack }: CourseViewProps) {
+  const { t } = useTranslation();
   const [progress, setProgress] = useState(getUserProgress());
   const course = getCourseById(courseId);
 
@@ -50,15 +50,13 @@ export function CourseView({ courseId, onNavigate, onBack }: CourseViewProps) {
 
   // Get all lessons for this course
   const courseLessons = getCourseLessons(courseId);
-  const completedLessons = courseLessons.filter(id => progress.completedLessons.includes(id));
+  const completedLessons = courseLessons.filter(lesson => progress.completedLessons.includes(lesson.id));
   const courseProgress = courseLessons.length > 0 
     ? Math.round((completedLessons.length / courseLessons.length) * 100)
     : 0;
 
-  // Get topics for this course
-  const courseTopics = course.topics
-    .map(topicId => getTopicById(topicId))
-    .filter(topic => topic !== undefined);
+  // Get topics for this course (already in hierarchical structure)
+  const courseTopics = course.topics;
 
   return (
     <div className="space-y-6">
@@ -79,9 +77,9 @@ export function CourseView({ courseId, onNavigate, onBack }: CourseViewProps) {
             <Badge className={`${course.bgColor} text-white border-0 mb-3`}>
               {course.level}
             </Badge>
-            <h1 className="mb-2">{course.title}</h1>
+            <h1 className="mb-2">{t(course.titleKey)}</h1>
             <p className="text-muted-foreground mb-4">
-              {course.description}
+              {t(course.descriptionKey)}
             </p>
           </div>
         </div>
@@ -152,7 +150,7 @@ export function CourseView({ courseId, onNavigate, onBack }: CourseViewProps) {
             if (!topic) return null;
             
             const topicLessons = topic.lessons;
-            const topicCompleted = topicLessons.filter(id => progress.completedLessons.includes(id));
+            const topicCompleted = topicLessons.filter(lesson => progress.completedLessons.includes(lesson.id));
             const topicProgress = topicLessons.length > 0 
               ? Math.round((topicCompleted.length / topicLessons.length) * 100)
               : 0;
@@ -160,13 +158,13 @@ export function CourseView({ courseId, onNavigate, onBack }: CourseViewProps) {
             const isStarted = topicProgress > 0;
 
             // Find next lesson to start or continue
-            const nextLesson = topicLessons.find(id => !progress.completedLessons.includes(id)) || topicLessons[0];
+            const nextLesson = topicLessons.find(lesson => !progress.completedLessons.includes(lesson.id)) || topicLessons[0];
 
             return (
               <Card 
                 key={topic.id}
                 className="p-6 border-2 hover:shadow-lg transition-all cursor-pointer bg-white"
-                onClick={() => onNavigate(nextLesson)}
+                onClick={() => onNavigate(nextLesson.id)}
               >
                 {/* Topic Icon & Status */}
                 <div className="flex items-start justify-between mb-3">
@@ -198,7 +196,7 @@ export function CourseView({ courseId, onNavigate, onBack }: CourseViewProps) {
                   </div>
                   <div className="flex items-center gap-1">
                     <Badge className={`${course.bgColor} text-white border-0 text-xs px-2 py-0.5`}>
-                      {topic.difficulty}
+                      {course.level}
                     </Badge>
                   </div>
                 </div>
@@ -224,7 +222,7 @@ export function CourseView({ courseId, onNavigate, onBack }: CourseViewProps) {
                     className="w-full text-[#225d9c] hover:bg-blue-50"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onNavigate(nextLesson);
+                      onNavigate(nextLesson.id);
                     }}
                   >
                     {isCompleted ? 'Review' : isStarted ? 'Continue' : 'Start'} →
@@ -245,7 +243,7 @@ export function CourseView({ courseId, onNavigate, onBack }: CourseViewProps) {
             </div>
             <h2 className="mb-2">🎉 Congratulations!</h2>
             <p className="text-muted-foreground mb-4">
-              You've completed the {course.title} course! Keep up the great work.
+              You've completed the {t(course.titleKey)} course! Keep up the great work.
             </p>
             <Button 
               onClick={onBack}

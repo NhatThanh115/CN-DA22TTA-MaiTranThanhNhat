@@ -75,7 +75,7 @@ export function calculateTopicProgress(
 
 // Update all topic progress
 export function updateAllTopicProgress(
-  topics: Array<{ id: string; lessons: string[] }>
+  topics: Array<{ id: string; lessons: Array<{ id: string }> | string[] }>
 ): void {
   const progress = getUserProgress();
   
@@ -85,9 +85,14 @@ export function updateAllTopicProgress(
   }
   
   topics.forEach(topic => {
+    // Handle both old format (string[]) and new format (Array<{id: string}>)
+    const lessonIds = Array.isArray(topic.lessons) 
+      ? topic.lessons.map(lesson => typeof lesson === 'string' ? lesson : lesson.id)
+      : [];
+    
     progress.topicProgress[topic.id] = calculateTopicProgress(
       topic.id,
-      topic.lessons,
+      lessonIds,
       progress.completedLessons
     );
   });

@@ -1,666 +1,832 @@
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
 
 const en = {
-  "nav": {
-    "home": "Home",
-    "lessons": "Lessons",
-    "progress": "Progress",
-    "coach": "AI Coach",
-    "account": "Account Settings",
-    "admin": "Admin Panel",
-    "logout": "Logout",
-    "login": "Login",
-    "signup": "Sign Up",
-    "searchLessons": "Search lessons...",
-    "noResults": "No lessons found"
+  nav: {
+    home: "Home",
+    lessons: "Lessons",
+    progress: "Progress",
+    coach: "AI Coach",
+    account: "Account Settings",
+    admin: "Admin Panel",
+    logout: "Logout",
+    login: "Login",
+    signup: "Sign Up",
+    searchLessons: "Search lessons...",
+    noResults: "No lessons found",
   },
-  "welcome": {
-    "title": "Welcome to TVEnglish",
-    "subtitle": "Master English with Interactive Lessons",
-    "description": "Learn English through structured lessons, interactive exercises, and real-world practice. Start your journey from beginner to advanced.",
-    "getStarted": "Get Started Free",
-    "learnMore": "Learn More",
-    "features": {
-      "title": "Why Choose TVEnglish?",
-      "structured": {
-        "title": "100+ Interactive Lessons",
-        "description": "Learn English with engaging, structured content organized by CEFR levels (A1-B2)"
+  welcome: {
+    title: "Welcome to TVEnglish",
+    subtitle: "Master English with Interactive Lessons",
+    description:
+      "Learn English through structured lessons, interactive exercises, and real-world practice. Start your journey from beginner to advanced.",
+    getStarted: "Get Started Free",
+    learnMore: "Learn More",
+    features: {
+      title: "Why Choose TVEnglish?",
+      structured: {
+        title: "100+ Interactive Lessons",
+        description:
+          "Learn English with engaging, structured content organized by CEFR levels (A1-B2)",
       },
-      "interactive": {
-        "title": "Practice Exercises",
-        "description": "Master English with quizzes and interactive exercises after each lesson"
+      interactive: {
+        title: "Practice Exercises",
+        description:
+          "Master English with quizzes and interactive exercises after each lesson",
       },
-      "progress": {
-        "title": "Track Your Progress",
-        "description": "Monitor your learning journey with detailed progress tracking and achievement badges"
-      }
-    }
-  },
-  "dashboard": {
-    "title": "Dashboard",
-    "welcome": "Welcome back",
-    "stats": {
-      "completed": "Completed Lessons",
-      "inProgress": "In Progress",
-      "streak": "Day Streak",
-      "totalLessons": "Total Lessons"
-    },
-    "courses": "Your Courses",
-    "lessons": "lessons",
-    "continue": "Continue Learning",
-    "start": "Start Course"
-  },
-  "sidebar": {
-    "courses": "Courses",
-    "topics": "Topics",
-    "lessons": "Lessons",
-    "topic": "topic",
-    "topics_plural": "topics"
-  },
-  "lesson": {
-    "difficulty": "Difficulty",
-    "keyPoints": "Key Points",
-    "examples": "Examples",
-    "practice": "Practice Exercise",
-    "checkAnswer": "Check Answer",
-    "nextLesson": "Next Lesson",
-    "completed": "Lesson Completed!",
-    "correct": "Correct!",
-    "incorrect": "Incorrect. Try again!",
-    "media": "Media"
-  },
-  "quiz": {
-    "title": "Quiz",
-    "question": "Question",
-    "submit": "Submit Answer",
-    "next": "Next Question",
-    "finish": "Finish Quiz",
-    "score": "Your Score",
-    "correct": "Correct",
-    "incorrect": "Incorrect",
-    "explanation": "Explanation"
-  },
-  "progress": {
-    "title": "Your Progress",
-    "overall": "Overall Progress",
-    "byTopic": "Progress by Topic",
-    "completed": "Completed",
-    "total": "Total",
-    "percentage": "Completion"
-  },
-  "comments": {
-    "title": "Comments",
-    "placeholder": "Share your thoughts or ask a question...",
-    "submit": "Post Comment",
-    "noComments": "No comments yet. Be the first to comment!",
-    "reply": "Reply",
-    "delete": "Delete",
-    "edit": "Edit"
-  },
-  "auth": {
-    "login": {
-      "title": "Login to TVEnglish",
-      "subtitle": "Welcome back! Please login to continue",
-      "email": "Email",
-      "password": "Password",
-      "button": "Login",
-      "noAccount": "Don't have an account?",
-      "signupLink": "Sign up here"
-    },
-    "signup": {
-      "title": "Create Account",
-      "subtitle": "Join TVEnglish and start learning today",
-      "name": "Full Name",
-      "email": "Email",
-      "password": "Password",
-      "confirmPassword": "Confirm Password",
-      "button": "Sign Up",
-      "hasAccount": "Already have an account?",
-      "loginLink": "Login here"
-    }
-  },
-  "common": {
-    "loading": "Loading...",
-    "error": "Error",
-    "success": "Success",
-    "cancel": "Cancel",
-    "save": "Save",
-    "delete": "Delete",
-    "edit": "Edit",
-    "close": "Close",
-    "back": "Back",
-    "next": "Next",
-    "previous": "Previous",
-    "search": "Search",
-    "filter": "Filter",
-    "all": "All",
-    "none": "None"
-  },
-  "account": {
-    "title": "Account Settings",
-    "subtitle": "Manage your profile and view your learning progress",
-    "edit": "Edit Profile",
-    "saved": "Profile updated successfully!",
-    "memberFor": "Member for",
-    "quickStats": "Quick Stats",
-    "progressOverview": "Progress Overview",
-    "courseProgress": "Course Progress",
-    "fields": {
-      "username": "Username",
-      "email": "Email",
-      "phone": "Phone Number",
-      "birthdate": "Birthdate",
-      "sex": "Gender"
-    },
-    "placeholders": {
-      "phone": "e.g. +1 234 567 8900",
-      "sex": "Select gender"
-    },
-    "sexOptions": {
-      "male": "Male",
-      "female": "Female",
-      "other": "Other",
-      "preferNotToSay": "Prefer not to say"
-    },
-    "errors": {
-      "requiredFields": "Username and email are required",
-      "invalidEmail": "Please enter a valid email address"
-    },
-    "stats": {
-      "streak": "Study Streak",
-      "completed": "Completed",
-      "topics": "Topics Done",
-      "avgScore": "Avg Score",
-      "overall": "Overall Progress",
-      "currentStreak": "Current Streak",
-      "daysInARow": "days in a row",
-      "timeSpent": "Time Spent",
-      "totalMinutes": "total minutes",
-      "wordsLearned": "Words Learned",
-      "vocabulary": "vocabulary",
-      "lessonsCompleted": "lessons completed",
-      "new": "New member",
-      "days": "days",
-      "weeks": "weeks",
-      "months": "months",
-      "years": "years"
-    }
-  },
-  "coach": {
-    "title": "AI English Coach",
-    "subtitle": "Get personalized help with your English learning journey",
-    "badge": "24/7 Available",
-    "welcome": "Hello! I'm your AI English Coach. I'm here to help you improve your English skills. You can ask me about grammar, vocabulary, pronunciation, or any other English learning topics. How can I help you today?",
-    "quickStart": "Quick Start Suggestions:",
-    "inputPlaceholder": "Type your question here... (Press Enter to send)",
-    "disclaimer": "Note: This is a simulated AI coach. For the best learning experience, practice regularly and review lessons.",
-    "prompts": {
-      "grammar": "Help me with English grammar",
-      "conversation": "Practice conversation with me",
-      "tips": "Give me study tips"
-    },
-    "responses": {
-      "grammar": "Great question about grammar! English grammar can be tricky, but with practice, it gets easier. Here are some tips:\n\n1. Focus on tenses - Present, Past, and Future forms\n2. Practice with sentence structures - Subject + Verb + Object\n3. Learn common irregular verbs\n4. Pay attention to articles (a, an, the)\n\nWhich specific grammar topic would you like to work on? I can provide more detailed explanations and examples!",
-      "vocabulary": "Building vocabulary is essential! Here are some effective strategies:\n\n1. Learn words in context, not in isolation\n2. Use flashcards or spaced repetition apps\n3. Read English content regularly\n4. Practice using new words in sentences\n5. Group words by themes or topics\n\nWould you like me to suggest some vocabulary exercises based on your current level?",
-      "practice": "Practice is the key to mastering English! Here are some ways to practice:\n\n1. Complete the exercises after each lesson\n2. Try speaking English daily, even to yourself\n3. Write short paragraphs about your day\n4. Watch English videos with subtitles\n5. Join language exchange communities\n\nWhich skill would you like to focus on: speaking, writing, listening, or reading?",
-      "pronunciation": "Pronunciation can be challenging, but here are some tips:\n\n1. Listen to native speakers and imitate them\n2. Record yourself and compare\n3. Practice difficult sounds repeatedly\n4. Learn the phonetic alphabet\n5. Focus on word stress and intonation\n\nWould you like to practice some specific sounds or words?",
-      "study": "Here are some effective study tips for learning English:\n\n1. Study consistently - 30 minutes daily is better than 3 hours once a week\n2. Set specific, achievable goals\n3. Use multiple resources (videos, books, apps)\n4. Practice all four skills: reading, writing, listening, speaking\n5. Review regularly to reinforce learning\n6. Don't be afraid to make mistakes!\n\nWhat's your current learning goal? I can help you create a study plan!",
-      "default": "That's an interesting question! I'm here to help you with:\n\n• Grammar rules and explanations\n• Vocabulary building\n• Pronunciation tips\n• Study strategies\n• Practice exercises\n• Conversation practice\n\nCould you tell me more specifically what you'd like to learn or practice? The more details you provide, the better I can assist you!"
-    }
-  },
-  "admin": {
-    "title": "Admin Panel",
-    "subtitle": "Manage users and content",
-    "role": "Role",
-    "userManagement": "User Management",
-    "contentManagement": "Content Management",
-    "accessDenied": "Access Denied",
-    "accessDeniedMessage": "You don't have permission to access the admin panel.",
-    "roles": {
-      "user": "User",
-      "moderator": "Moderator",
-      "admin": "Admin"
-    },
-    "users": {
-      "searchPlaceholder": "Search by username or email...",
-      "filterByRole": "Filter by role",
-      "filterByStatus": "Filter by status",
-      "allRoles": "All Roles",
-      "allStatuses": "All Statuses",
-      "active": "Active",
-      "inactive": "Inactive",
-      "totalUsers": "Total Users",
-      "activeUsers": "Active Users",
-      "moderators": "Moderators",
-      "admins": "Admins",
-      "username": "Username",
-      "email": "Email",
-      "role": "Role",
-      "status": "Status",
-      "progress": "Progress",
-      "actions": "Actions",
-      "lessons": "lessons",
-      "dayStreak": "day streak",
-      "learningStats": "Learning Statistics",
-      "statsDescription": "View detailed learning progress and statistics",
-      "lessonsCompleted": "Lessons Completed",
-      "studyStreak": "Study Streak",
-      "days": "days",
-      "avgScore": "Average Score",
-      "joinDate": "Join Date",
-      "changeRole": "Change User Role",
-      "changeRoleDescription": "Update user permissions and access level",
-      "currentRole": "Current Role",
-      "activated": "User {{username}} activated successfully",
-      "deactivated": "User {{username}} deactivated successfully",
-      "roleChanged": "Role changed to {{role}} for {{username}}",
-      "onlyAdminCanChangeRoles": "Only admins can change user roles"
-    },
-    "content": {
-      "lessonManagement": "Lesson Management",
-      "lessonManagementDesc": "Create, edit, and organize lessons",
-      "createLesson": "Create New Lesson",
-      "editLesson": "Edit Lesson",
-      "searchLessons": "Search lessons...",
-      "filterByDifficulty": "Filter by difficulty",
-      "filterByType": "Filter by type",
-      "allDifficulties": "All Difficulties",
-      "allTypes": "All Types",
-      "totalLessons": "Total Lessons",
-      "published": "Published",
-      "drafts": "Drafts",
-      "exercises": "Exercises",
-      "draft": "Draft",
-      "hasVideo": "Has Video",
-      "hasAudio": "Has Audio",
-      "addExercise": "Add Exercise",
-      "editExercise": "Edit Exercise",
-      "lessonFormDescription": "Fill in the lesson details below",
-      "exerciseFormDescription": "Create an interactive exercise for this lesson",
-      "lessonTitle": "Lesson Title",
-      "lessonTitlePlaceholder": "e.g. Present Simple Tense",
-      "description": "Description",
-      "descriptionPlaceholder": "Brief description of the lesson...",
-      "difficulty": "Difficulty Level",
-      "type": "Lesson Type",
-      "lessonContent": "Lesson Content",
-      "contentPlaceholder": "Write the main lesson content here...",
-      "videoUrl": "Video URL (Optional)",
-      "audioUrl": "Audio URL (Optional)",
-      "status": "Status",
-      "create": "Create",
-      "requiredFields": "Please fill in all required fields",
-      "lessonCreated": "Lesson created successfully",
-      "lessonUpdated": "Lesson updated successfully",
-      "lessonDeleted": "Lesson deleted successfully",
-      "confirmDelete": "Are you sure you want to delete this lesson?",
-      "exerciseType": "Exercise Type",
-      "question": "Question",
-      "questionPlaceholder": "Enter the exercise question...",
-      "options": "Answer Options",
-      "option": "Option",
-      "correctAnswer": "Correct Answer",
-      "correctAnswerPlaceholder": "Enter the correct answer...",
-      "explanation": "Explanation (Optional)",
-      "explanationPlaceholder": "Explain why this is the correct answer...",
-      "exerciseRequiredFields": "Please fill in question and correct answer",
-      "exerciseCreated": "Exercise created successfully",
-      "exerciseUpdated": "Exercise updated successfully",
-      "exerciseDeleted": "Exercise deleted successfully",
-      "types": {
-        "grammar": "Grammar",
-        "vocabulary": "Vocabulary",
-        "listening": "Listening",
-        "speaking": "Speaking",
-        "reading": "Reading",
-        "writing": "Writing"
+      progress: {
+        title: "Track Your Progress",
+        description:
+          "Monitor your learning journey with detailed progress tracking and achievement badges",
       },
-      "exerciseTypes": {
+    },
+  },
+  dashboard: {
+    title: "Dashboard",
+    welcome: "Welcome back",
+    currentLevel: "You're currently learning at",
+    level: "level",
+    stats: {
+      completed: "Completed Lessons",
+      inProgress: "In Progress",
+      streak: "Day Streak",
+      totalLessons: "Total Lessons",
+      totalProgress: "Total Progress",
+      pointsEarned: "Points Earned",
+      keepItUp: "Keep it up!",
+      badges: "Badges",
+      achievements: "achievements",
+    },
+    continueLearning: {
+      title: "Continue where you left off",
+      progress: "Progress",
+    },
+    courses: "Your Courses",
+    viewAll: "View All Courses",
+    recommended: "Recommended for You",
+    progress: "Progress",
+    hours: "hours",
+    topics: "topics",
+    lessons: "lessons",
+    continue: "Continue Learning",
+    continueCourse: "Continue Course",
+    start: "Start Course",
+  },
+  sidebar: {
+    courses: "Courses",
+    topics: "Topics",
+    lessons: "Lessons",
+    topic: "topic",
+    topics_plural: "topics",
+  },
+  lesson: {
+    difficulty: "Difficulty",
+    keyPoints: "Key Points",
+    examples: "Examples",
+    practice: "Practice Exercise",
+    checkAnswer: "Check Answer",
+    nextLesson: "Next Lesson",
+    completed: "Lesson Completed!",
+    correct: "Correct!",
+    incorrect: "Incorrect. Try again!",
+    media: "Media",
+  },
+  quiz: {
+    title: "Quiz",
+    question: "Question",
+    submit: "Submit Answer",
+    next: "Next Question",
+    finish: "Finish Quiz",
+    score: "Your Score",
+    correct: "Correct",
+    incorrect: "Incorrect",
+    explanation: "Explanation",
+  },
+  progress: {
+    title: "Your Progress",
+    overall: "Overall Progress",
+    byTopic: "Progress by Topic",
+    completed: "Completed",
+    total: "Total",
+    percentage: "Completion",
+  },
+  comments: {
+    title: "Comments",
+    placeholder: "Share your thoughts or ask a question...",
+    submit: "Post Comment",
+    noComments: "No comments yet. Be the first to comment!",
+    reply: "Reply",
+    delete: "Delete",
+    edit: "Edit",
+  },
+  auth: {
+    login: {
+      title: "Login to TVEnglish",
+      subtitle: "Welcome back! Please login to continue",
+      email: "Email",
+      password: "Password",
+      button: "Login",
+      noAccount: "Don't have an account?",
+      signupLink: "Sign up here",
+    },
+    signup: {
+      title: "Create Account",
+      subtitle: "Join TVEnglish and start learning today",
+      name: "Full Name",
+      email: "Email",
+      password: "Password",
+      confirmPassword: "Confirm Password",
+      button: "Sign Up",
+      hasAccount: "Already have an account?",
+      loginLink: "Login here",
+    },
+  },
+  common: {
+    loading: "Loading...",
+    error: "Error",
+    success: "Success",
+    cancel: "Cancel",
+    save: "Save",
+    delete: "Delete",
+    edit: "Edit",
+    close: "Close",
+    back: "Back",
+    next: "Next",
+    previous: "Previous",
+    search: "Search",
+    filter: "Filter",
+    all: "All",
+    none: "None",
+  },
+  courses: {
+    a1: {
+      title: "Beginner (A1)",
+      description:
+        "Start your English learning journey! Master basic greetings, simple sentences, and everyday vocabulary.",
+    },
+    a2: {
+      title: "Elementary (A2)",
+      description:
+        "Build on your basics! Learn past tenses, more complex sentences, and expand your vocabulary.",
+    },
+    b1: {
+      title: "Intermediate (B1)",
+      description:
+        "Become an independent user! Master complex grammar, discuss abstract topics, and improve fluency.",
+    },
+    b2: {
+      title: "Upper-Intermediate (B2)",
+      description:
+        "Achieve advanced proficiency! Handle complex discussions, understand nuanced language, and express yourself fluently.",
+    },
+  },
+  account: {
+    title: "Account Settings",
+    subtitle:
+      "Manage your profile and view your learning progress",
+    edit: "Edit Profile",
+    saved: "Profile updated successfully!",
+    memberFor: "Member for",
+    quickStats: "Quick Stats",
+    progressOverview: "Progress Overview",
+    courseProgress: "Course Progress",
+    fields: {
+      username: "Username",
+      email: "Email",
+      phone: "Phone Number",
+      birthdate: "Birthdate",
+      sex: "Gender",
+    },
+    placeholders: {
+      phone: "e.g. +1 234 567 8900",
+      sex: "Select gender",
+    },
+    sexOptions: {
+      male: "Male",
+      female: "Female",
+      other: "Other",
+      preferNotToSay: "Prefer not to say",
+    },
+    errors: {
+      requiredFields: "Username and email are required",
+      invalidEmail: "Please enter a valid email address",
+    },
+    stats: {
+      streak: "Study Streak",
+      completed: "Completed",
+      topics: "Topics Done",
+      avgScore: "Avg Score",
+      overall: "Overall Progress",
+      currentStreak: "Current Streak",
+      daysInARow: "days in a row",
+      timeSpent: "Time Spent",
+      totalMinutes: "total minutes",
+      wordsLearned: "Words Learned",
+      vocabulary: "vocabulary",
+      lessonsCompleted: "lessons completed",
+      new: "New member",
+      days: "days",
+      weeks: "weeks",
+      months: "months",
+      years: "years",
+    },
+  },
+  coach: {
+    title: "AI English Coach",
+    subtitle:
+      "Get personalized help with your English learning journey",
+    badge: "24/7 Available",
+    welcome:
+      "Hello! I'm your AI English Coach. I'm here to help you improve your English skills. You can ask me about grammar, vocabulary, pronunciation, or any other English learning topics. How can I help you today?",
+    quickStart: "Quick Start Suggestions:",
+    inputPlaceholder:
+      "Type your question here... (Press Enter to send)",
+    disclaimer:
+      "Note: This is a simulated AI coach. For the best learning experience, practice regularly and review lessons.",
+    prompts: {
+      grammar: "Help me with English grammar",
+      conversation: "Practice conversation with me",
+      tips: "Give me study tips",
+    },
+    responses: {
+      grammar:
+        "Great question about grammar! English grammar can be tricky, but with practice, it gets easier. Here are some tips:\n\n1. Focus on tenses - Present, Past, and Future forms\n2. Practice with sentence structures - Subject + Verb + Object\n3. Learn common irregular verbs\n4. Pay attention to articles (a, an, the)\n\nWhich specific grammar topic would you like to work on? I can provide more detailed explanations and examples!",
+      vocabulary:
+        "Building vocabulary is essential! Here are some effective strategies:\n\n1. Learn words in context, not in isolation\n2. Use flashcards or spaced repetition apps\n3. Read English content regularly\n4. Practice using new words in sentences\n5. Group words by themes or topics\n\nWould you like me to suggest some vocabulary exercises based on your current level?",
+      practice:
+        "Practice is the key to mastering English! Here are some ways to practice:\n\n1. Complete the exercises after each lesson\n2. Try speaking English daily, even to yourself\n3. Write short paragraphs about your day\n4. Watch English videos with subtitles\n5. Join language exchange communities\n\nWhich skill would you like to focus on: speaking, writing, listening, or reading?",
+      pronunciation:
+        "Pronunciation can be challenging, but here are some tips:\n\n1. Listen to native speakers and imitate them\n2. Record yourself and compare\n3. Practice difficult sounds repeatedly\n4. Learn the phonetic alphabet\n5. Focus on word stress and intonation\n\nWould you like to practice some specific sounds or words?",
+      study:
+        "Here are some effective study tips for learning English:\n\n1. Study consistently - 30 minutes daily is better than 3 hours once a week\n2. Set specific, achievable goals\n3. Use multiple resources (videos, books, apps)\n4. Practice all four skills: reading, writing, listening, speaking\n5. Review regularly to reinforce learning\n6. Don't be afraid to make mistakes!\n\nWhat's your current learning goal? I can help you create a study plan!",
+      default:
+        "That's an interesting question! I'm here to help you with:\n\n• Grammar rules and explanations\n• Vocabulary building\n• Pronunciation tips\n• Study strategies\n• Practice exercises\n• Conversation practice\n\nCould you tell me more specifically what you'd like to learn or practice? The more details you provide, the better I can assist you!",
+    },
+  },
+  admin: {
+    title: "Admin Panel",
+    subtitle: "Manage users and content",
+    role: "Role",
+    userManagement: "User Management",
+    contentManagement: "Content Management",
+    accessDenied: "Access Denied",
+    accessDeniedMessage:
+      "You don't have permission to access the admin panel.",
+    roles: {
+      user: "User",
+      moderator: "Moderator",
+      admin: "Admin",
+    },
+    users: {
+      searchPlaceholder: "Search by username or email...",
+      filterByRole: "Filter by role",
+      filterByStatus: "Filter by status",
+      allRoles: "All Roles",
+      allStatuses: "All Statuses",
+      active: "Active",
+      inactive: "Inactive",
+      totalUsers: "Total Users",
+      activeUsers: "Active Users",
+      moderators: "Moderators",
+      admins: "Admins",
+      username: "Username",
+      email: "Email",
+      role: "Role",
+      status: "Status",
+      progress: "Progress",
+      actions: "Actions",
+      lessons: "lessons",
+      dayStreak: "day streak",
+      learningStats: "Learning Statistics",
+      statsDescription:
+        "View detailed learning progress and statistics",
+      lessonsCompleted: "Lessons Completed",
+      studyStreak: "Study Streak",
+      days: "days",
+      avgScore: "Average Score",
+      joinDate: "Join Date",
+      changeRole: "Change User Role",
+      changeRoleDescription:
+        "Update user permissions and access level",
+      currentRole: "Current Role",
+      activated: "User {{username}} activated successfully",
+      deactivated: "User {{username}} deactivated successfully",
+      roleChanged: "Role changed to {{role}} for {{username}}",
+      onlyAdminCanChangeRoles:
+        "Only admins can change user roles",
+    },
+    content: {
+      lessonManagement: "Lesson Management",
+      lessonManagementDesc:
+        "Create, edit, and organize lessons",
+      createLesson: "Create New Lesson",
+      editLesson: "Edit Lesson",
+      searchLessons: "Search lessons...",
+      filterByDifficulty: "Filter by difficulty",
+      filterByType: "Filter by type",
+      allDifficulties: "All Difficulties",
+      allTypes: "All Types",
+      course: "Course",
+      topic: "Topic",
+      selectCourse: "Select a course",
+      selectTopic: "Select a topic",
+      totalLessons: "Total Lessons",
+      published: "Published",
+      drafts: "Drafts",
+      exercises: "Exercises",
+      draft: "Draft",
+      topicSection: "Topic Selection",
+      createNewTopic: "Create New Topic",
+      selectExistingTopic: "Use Existing Topic",
+      existingTopic: "Existing Topic",
+      selectCourseFirst: "Please select a course first",
+      topicName: "Topic Name",
+      topicNamePlaceholder: "e.g. Business Communication",
+      topicDescription: "Topic Description",
+      topicDescriptionPlaceholder:
+        "Brief description of this topic...",
+      topicIcon: "Topic Icon (Emoji)",
+      topicIconHint:
+        "Enter an emoji that represents this topic",
+      hasVideo: "Has Video",
+      hasAudio: "Has Audio",
+      addExercise: "Add Exercise",
+      editExercise: "Edit Exercise",
+      lessonFormDescription: "Fill in the lesson details below",
+      exerciseFormDescription:
+        "Create an interactive exercise for this lesson",
+      lessonTitle: "Lesson Title",
+      lessonTitlePlaceholder: "e.g. Present Simple Tense",
+      description: "Description",
+      descriptionPlaceholder:
+        "Brief description of the lesson...",
+      difficulty: "Difficulty Level",
+      type: "Lesson Type",
+      lessonContent: "Lesson Content",
+      contentPlaceholder:
+        "Write the main lesson content here...",
+      videoUrl: "Video URL (Optional)",
+      audioUrl: "Audio URL (Optional)",
+      status: "Status",
+      create: "Create",
+      requiredFields: "Please fill in all required fields",
+      lessonCreated: "Lesson created successfully",
+      lessonUpdated: "Lesson updated successfully",
+      lessonDeleted: "Lesson deleted successfully",
+      confirmDelete:
+        "Are you sure you want to delete this lesson?",
+      exerciseType: "Exercise Type",
+      question: "Question",
+      questionPlaceholder: "Enter the exercise question...",
+      options: "Answer Options",
+      option: "Option",
+      correctAnswer: "Correct Answer",
+      correctAnswerPlaceholder: "Enter the correct answer...",
+      explanation: "Explanation (Optional)",
+      explanationPlaceholder:
+        "Explain why this is the correct answer...",
+      exerciseRequiredFields:
+        "Please fill in question and correct answer",
+      exerciseCreated: "Exercise created successfully",
+      exerciseUpdated: "Exercise updated successfully",
+      exerciseDeleted: "Exercise deleted successfully",
+      types: {
+        grammar: "Grammar",
+        vocabulary: "Vocabulary",
+        listening: "Listening",
+        speaking: "Speaking",
+        reading: "Reading",
+        writing: "Writing",
+      },
+      exerciseTypes: {
         "multiple-choice": "Multiple Choice",
         "fill-blank": "Fill in the Blank",
-        "true-false": "True/False"
-      }
-    }
-  }
+        "true-false": "True/False",
+      },
+    },
+  },
 };
 
 const vi = {
-  "nav": {
-    "home": "Trang chủ",
-    "lessons": "Bài học",
-    "progress": "Tiến độ",
-    "coach": "Huấn luyện viên AI",
-    "account": "Cài đặt Tài khoản",
-    "admin": "Bảng quản trị",
-    "logout": "Đăng xuất",
-    "login": "Đăng nhập",
-    "signup": "Đăng ký",
-    "searchLessons": "Tìm kiếm bài học...",
-    "noResults": "Không tìm thấy bài học"
+  nav: {
+    home: "Trang chủ",
+    lessons: "Bài học",
+    progress: "Tiến độ",
+    coach: "Huấn luyện viên AI",
+    account: "Cài đặt Tài khoản",
+    admin: "Bảng quản trị",
+    logout: "Đăng xuất",
+    login: "Đăng nhập",
+    signup: "Đăng ký",
+    searchLessons: "Tìm kiếm bài học...",
+    noResults: "Không tìm thấy bài học",
   },
-  "welcome": {
-    "title": "Chào mừng đến với TVEnglish",
-    "subtitle": "Làm chủ tiếng Anh với các bài học tương tác",
-    "description": "Học tiếng Anh thông qua các bài học có cấu trúc, bài tập tương tác và thực hành trong tình huống thực tế. Bắt đầu hành trình của bạn từ cơ bản đến nâng cao.",
-    "getStarted": "Bắt đầu miễn phí",
-    "learnMore": "Tìm hiểu thêm",
-    "features": {
-      "title": "Tại sao chọn TVEnglish?",
-      "structured": {
-        "title": "100+ Bài học tương tác",
-        "description": "Học tiếng Anh với nội dung hấp dẫn, có cấu trúc được tổ chức theo cấp độ CEFR (A1-B2)"
+  welcome: {
+    title: "Chào mừng đến với TVEnglish",
+    subtitle: "Làm chủ tiếng Anh với các bài học tương tác",
+    description:
+      "Học tiếng Anh thông qua các bài học có cấu trúc, bài tập tương tác và thực hành trong tình huống thực tế. Bắt đầu hành trình của bạn từ cơ bản đến nâng cao.",
+    getStarted: "Bắt đầu miễn phí",
+    learnMore: "Tìm hiểu thêm",
+    features: {
+      title: "Tại sao chọn TVEnglish?",
+      structured: {
+        title: "100+ Bài học tương tác",
+        description:
+          "Học tiếng Anh với nội dung hấp dẫn, có cấu trúc được tổ chức theo cấp độ CEFR (A1-B2)",
       },
-      "interactive": {
-        "title": "Bài tập thực hành",
-        "description": "Thành thạo tiếng Anh với các câu đố và bài tập tương tác sau mỗi bài học"
+      interactive: {
+        title: "Bài tập thực hành",
+        description:
+          "Thành thạo tiếng Anh với các câu đố và bài tập tương tác sau mỗi bài học",
       },
-      "progress": {
-        "title": "Theo dõi tiến độ",
-        "description": "Giám sát hành trình học tập của bạn với theo dõi tiến độ chi tiết và huy hiệu thành tích"
-      }
-    }
-  },
-  "dashboard": {
-    "title": "Bảng điều khiển",
-    "welcome": "Chào mừng trở lại",
-    "stats": {
-      "completed": "Bài học đã hoàn thành",
-      "inProgress": "Đang học",
-      "streak": "Chuỗi ngày",
-      "totalLessons": "Tổng số bài học"
-    },
-    "courses": "Khóa học của bạn",
-    "lessons": "bài học",
-    "continue": "Tiếp tục học",
-    "start": "Bắt đầu khóa học"
-  },
-  "sidebar": {
-    "courses": "Khóa học",
-    "topics": "Chủ đề",
-    "lessons": "Bài học",
-    "topic": "chủ đề",
-    "topics_plural": "chủ đề"
-  },
-  "lesson": {
-    "difficulty": "Độ khó",
-    "keyPoints": "Điểm chính",
-    "examples": "Ví dụ",
-    "practice": "Bài tập thực hành",
-    "checkAnswer": "Kiểm tra đáp án",
-    "nextLesson": "Bài học tiếp theo",
-    "completed": "Hoàn thành bài học!",
-    "correct": "Chính xác!",
-    "incorrect": "Không chính xác. Thử lại!",
-    "media": "Phương tiện"
-  },
-  "quiz": {
-    "title": "Bài kiểm tra",
-    "question": "Câu hỏi",
-    "submit": "Nộp câu trả lời",
-    "next": "Câu hỏi tiếp theo",
-    "finish": "Hoàn thành bài kiểm tra",
-    "score": "Điểm của bạn",
-    "correct": "Đúng",
-    "incorrect": "Sai",
-    "explanation": "Giải thích"
-  },
-  "progress": {
-    "title": "Tiến độ của bạn",
-    "overall": "Tiến độ tổng thể",
-    "byTopic": "Tiến độ theo chủ đề",
-    "completed": "Đã hoàn thành",
-    "total": "Tổng số",
-    "percentage": "Hoàn thành"
-  },
-  "comments": {
-    "title": "Bình luận",
-    "placeholder": "Chia sẻ suy nghĩ của bạn hoặc đặt câu hỏi...",
-    "submit": "Đăng bình luận",
-    "noComments": "Chưa có bình luận nào. Hãy là người đầu tiên bình luận!",
-    "reply": "Trả lời",
-    "delete": "Xóa",
-    "edit": "Chỉnh sửa"
-  },
-  "auth": {
-    "login": {
-      "title": "Đăng nhập vào TVEnglish",
-      "subtitle": "Chào mừng trở lại! Vui lòng đăng nhập để tiếp tục",
-      "email": "Email",
-      "password": "Mật khẩu",
-      "button": "Đăng nhập",
-      "noAccount": "Chưa có tài khoản?",
-      "signupLink": "Đăng ký tại đây"
-    },
-    "signup": {
-      "title": "Tạo tài khoản",
-      "subtitle": "Tham gia TVEnglish và bắt đầu học hôm nay",
-      "name": "Họ và tên",
-      "email": "Email",
-      "password": "Mật khẩu",
-      "confirmPassword": "Xác nhận mật khẩu",
-      "button": "Đăng ký",
-      "hasAccount": "Đã có tài khoản?",
-      "loginLink": "Đăng nhập tại đây"
-    }
-  },
-  "common": {
-    "loading": "Đang tải...",
-    "error": "Lỗi",
-    "success": "Thành công",
-    "cancel": "Hủy",
-    "save": "Lưu",
-    "delete": "Xóa",
-    "edit": "Chỉnh sửa",
-    "close": "Đóng",
-    "back": "Quay lại",
-    "next": "Tiếp theo",
-    "previous": "Trước",
-    "search": "Tìm kiếm",
-    "filter": "Lọc",
-    "all": "Tất cả",
-    "none": "Không có"
-  },
-  "account": {
-    "title": "Cài đặt Tài khoản",
-    "subtitle": "Quản lý hồ sơ và xem tiến trình học tập của bạn",
-    "edit": "Chỉnh sửa Hồ sơ",
-    "saved": "Hồ sơ đã được cập nhật thành công!",
-    "memberFor": "Thành viên từ",
-    "quickStats": "Thống kê Nhanh",
-    "progressOverview": "Tổng Quan về Tiến trình",
-    "courseProgress": "Tiến trình Khóa học",
-    "fields": {
-      "username": "Tên người dùng",
-      "email": "Email",
-      "phone": "Số điện thoại",
-      "birthdate": "Ngày sinh",
-      "sex": "Giới tính"
-    },
-    "placeholders": {
-      "phone": "ví dụ: +1 234 567 8900",
-      "sex": "Chọn giới tính"
-    },
-    "sexOptions": {
-      "male": "Nam",
-      "female": "Nữ",
-      "other": "Khác",
-      "preferNotToSay": "Không muốn nói"
-    },
-    "errors": {
-      "requiredFields": "Tên người dùng và email là bắt buộc",
-      "invalidEmail": "Vui lòng nhập địa chỉ email hợp lệ"
-    },
-    "stats": {
-      "streak": "Chuỗi học tp",
-      "completed": "Đã hoàn thành",
-      "topics": "Chủ đề đã hoàn thành",
-      "avgScore": "Điểm trung bình",
-      "overall": "Tiến độ tổng thể",
-      "currentStreak": "Chuỗi hiện tại",
-      "daysInARow": "ngày liên tiếp",
-      "timeSpent": "Thời gian đã dành",
-      "totalMinutes": "tổng số phút",
-      "wordsLearned": "Từ đã học",
-      "vocabulary": "từ vựng",
-      "lessonsCompleted": "bài học đã hoàn thành",
-      "new": "Thành viên mới",
-      "days": "ngày",
-      "weeks": "tuần",
-      "months": "tháng",
-      "years": "năm"
-    }
-  },
-  "coach": {
-    "title": "Huấn luyện viên AI tiếng Anh",
-    "subtitle": "Nhận trợ giúp cá nhân hóa cho hành trình học tiếng Anh của bạn",
-    "badge": "Có sẵn 24/7",
-    "welcome": "Xin chào! Tôi là Huấn luyện viên AI tiếng Anh của bạn. Tôi ở đây để giúp bạn cải thiện kỹ năng tiếng Anh. Bạn có thể hỏi tôi về ngữ pháp, từ vựng, phát âm hoặc bất kỳ chủ đề học tiếng Anh nào khác. Tôi có thể giúp gì cho bn hôm nay?",
-    "quickStart": "Gợi ý bắt đầu nhanh:",
-    "inputPlaceholder": "Nhập câu hỏi của bạn ở đây... (Nhấn Enter để gửi)",
-    "disclaimer": "Lưu ý: Đây là một huấn luyện viên AI mô phỏng. Để có trải nghiệm học tập tốt nhất, hãy thực hành thường xuyên và xem lại các bài học.",
-    "prompts": {
-      "grammar": "Giúp tôi với ngữ pháp tiếng Anh",
-      "conversation": "Thực hành hội thoại với tôi",
-      "tips": "Cho tôi lời khuyên học tập"
-    },
-    "responses": {
-      "grammar": "Câu hỏi hay về ngữ pháp! Ngữ pháp tiếng Anh có thể khó, nhưng với thực hành, nó sẽ dễ dàng hơn. Đây là một số mẹo:\n\n1. Tập trung vào các thì - Hiện tại, Quá khứ và Tương lai\n2. Thực hành với cấu trúc câu - Chủ ngữ + Động từ + Tân ngữ\n3. Học các động từ bất quy tắc phổ biến\n4. Chú ý đến mạo từ (a, an, the)\n\nBạn muốn làm việc với chủ đề ngữ pháp cụ thể nào? Tôi có thể cung cấp giải thích và ví dụ chi tiết hơn!",
-      "vocabulary": "Xây dựng từ vựng là điều cần thiết! Đây là một số chiến lược hiệu quả:\n\n1. Học từ trong ngữ cảnh, không riêng lẻ\n2. Sử dụng thẻ ghi nhớ hoặc ứng dụng lặp lại có khoảng cách\n3. Đọc nội dung tiếng Anh thường xuyên\n4. Thực hành sử dụng từ mới trong câu\n5. Nhóm từ theo chủ đề\n\nBạn có muốn tôi đề xuất một số bài tập từ vựng dựa trên trình độ hiện tại của bạn không?",
-      "practice": "Thực hành là chìa khóa để làm chủ tiếng Anh! Đây là một số cách để thực hành:\n\n1. Hoàn thành các bài tập sau mỗi bài học\n2. Cố gắng nói tiếng Anh hàng ngày, ngay cả với chính bạn\n3. Viết đoạn văn ngắn về ngày của bạn\n4. Xem video tiếng Anh với phụ đề\n5. Tham gia cộng đồng trao đổi ngôn ngữ\n\nBạn muốn tập trung vào kỹ năng nào: nói, viết, nghe hay đọc?",
-      "pronunciation": "Phát âm có thể là thách thức, nhưng đây là một số mẹo:\n\n1. Nghe người bản ngữ và bắt chước họ\n2. Ghi âm bản thân và so sánh\n3. Thực hành các âm khó lặp đi lặp lại\n4. Học bảng chữ cái phiên âm\n5. Tập trung vào trọng âm từ và ngữ điệu\n\nBạn có muốn thực hành một số âm hoặc từ cụ thể không?",
-      "study": "Đây là một số mẹo học tập hiệu quả để học tiếng Anh:\n\n1. Học đều đặn - 30 phút mỗi ngày tốt hơn 3 giờ mỗi tuần một lần\n2. Đặt mục tiêu cụ thể, có thể đạt được\n3. Sử dụng nhiều nguồn tài nguyên (video, sách, ứng dụng)\n4. Thực hành cả bốn kỹ năng: đọc, viết, nghe, nói\n5. Xem lại thường xuyên để củng cố việc học\n6. Đừng ngại mắc lỗi!\n\nMục tiêu học tập hiện tại của bạn là gì? Tôi có thể giúp bạn tạo kế hoạch học tập!",
-      "default": "Đó là một câu hỏi thú vị! Tôi ở đây để giúp bạn với:\n\n• Quy tắc và giải thích ngữ pháp\n• Xây dựng từ vựng\n• Mẹo phát âm\n• Chiến lược học tập\n• Bài tập thực hành\n• Thực hành hội thoại\n\nBạn có thể cho tôi biết cụ thể hơn về những gì bạn muốn học hoặc thực hành không? Càng nhiều chi tiết bạn cung cấp, tôi càng có thể hỗ trợ bạn tốt hơn!"
-    }
-  },
-  "admin": {
-    "title": "Bảng quản trị",
-    "subtitle": "Quản lý người dùng và nội dung",
-    "role": "Vai trò",
-    "userManagement": "Quản lý Người dùng",
-    "contentManagement": "Quản lý Nội dung",
-    "accessDenied": "Truy cập bị từ chối",
-    "accessDeniedMessage": "Bạn không có quyền truy cập bảng quản trị.",
-    "roles": {
-      "user": "Người dùng",
-      "moderator": "Người kiểm duyệt",
-      "admin": "Quản trị viên"
-    },
-    "users": {
-      "searchPlaceholder": "Tìm kiếm theo tên người dùng hoặc email...",
-      "filterByRole": "Lọc theo vai trò",
-      "filterByStatus": "Lọc theo trạng thái",
-      "allRoles": "Tất cả vai trò",
-      "allStatuses": "Tất cả trạng thái",
-      "active": "Đang hoạt động",
-      "inactive": "Không hoạt động",
-      "totalUsers": "Tổng số người dùng",
-      "activeUsers": "Người dùng đang hoạt động",
-      "moderators": "Người kiểm duyệt",
-      "admins": "Quản trị viên",
-      "username": "Tên người dùng",
-      "email": "Email",
-      "role": "Vai trò",
-      "status": "Trạng thái",
-      "progress": "Tiến độ",
-      "actions": "Hành động",
-      "lessons": "bài học",
-      "dayStreak": "chuỗi ngày",
-      "learningStats": "Thống kê Học tập",
-      "statsDescription": "Xem tiến độ học tập chi tiết và thống kê",
-      "lessonsCompleted": "Bài học đã hoàn thành",
-      "studyStreak": "Chuỗi học tập",
-      "days": "ngày",
-      "avgScore": "Điểm trung bình",
-      "joinDate": "Ngày tham gia",
-      "changeRole": "Thay đổi Vai trò Người dùng",
-      "changeRoleDescription": "Cập nhật quyền và cấp độ truy cập",
-      "currentRole": "Vai trò hiện tại",
-      "activated": "Người dùng {{username}} đã được kích hoạt thành công",
-      "deactivated": "Người dùng {{username}} đã bị vô hiệu hóa thành công",
-      "roleChanged": "Vai trò đã được thay đổi thành {{role}} cho {{username}}",
-      "onlyAdminCanChangeRoles": "Chỉ quản trị viên mới có thể thay đổi vai trò người dùng"
-    },
-    "content": {
-      "lessonManagement": "Quản lý Bài học",
-      "lessonManagementDesc": "Tạo, chỉnh sửa và sắp xếp bài học",
-      "createLesson": "Tạo Bài học Mới",
-      "editLesson": "Chỉnh sửa Bài học",
-      "searchLessons": "Tìm kiếm bài học...",
-      "filterByDifficulty": "Lọc theo độ khó",
-      "filterByType": "Lọc theo loại",
-      "allDifficulties": "Tất cả độ khó",
-      "allTypes": "Tất cả loại",
-      "totalLessons": "Tổng số Bài học",
-      "published": "Đã xuất bản",
-      "drafts": "Bản nháp",
-      "exercises": "Bài tập",
-      "draft": "Bản nháp",
-      "hasVideo": "Có Video",
-      "hasAudio": "Có Audio",
-      "addExercise": "Thêm Bài tập",
-      "editExercise": "Chỉnh sửa Bài tập",
-      "lessonFormDescription": "Điền thông tin chi tiết bài học bên dưới",
-      "exerciseFormDescription": "Tạo bài tập tương tác cho bài học này",
-      "lessonTitle": "Tiêu đề Bài học",
-      "lessonTitlePlaceholder": "ví dụ: Thì Hiện tại Đơn",
-      "description": "Mô tả",
-      "descriptionPlaceholder": "Mô tả ngắn gọn về bài học...",
-      "difficulty": "Mức độ Khó",
-      "type": "Loại Bài học",
-      "lessonContent": "Nội dung Bài học",
-      "contentPlaceholder": "Viết nội dung chính của bài học ở đây...",
-      "videoUrl": "URL Video (Tùy chọn)",
-      "audioUrl": "URL Audio (Tùy chọn)",
-      "status": "Trạng thái",
-      "create": "Tạo",
-      "requiredFields": "Vui lòng điền tất cả các trường bắt buộc",
-      "lessonCreated": "Bài học đã được tạo thành công",
-      "lessonUpdated": "Bài học đã được cập nhật thành công",
-      "lessonDeleted": "Bài học đã được xóa thành công",
-      "confirmDelete": "Bạn có chắc chắn muốn xóa bài học này không?",
-      "exerciseType": "Loại Bài tập",
-      "question": "Câu hỏi",
-      "questionPlaceholder": "Nhập câu hỏi bài tập...",
-      "options": "Tùy chọn Trả lời",
-      "option": "Tùy chọn",
-      "correctAnswer": "Đáp án Đúng",
-      "correctAnswerPlaceholder": "Nhập đáp án đúng...",
-      "explanation": "Giải thích (Tùy chọn)",
-      "explanationPlaceholder": "Giải thích tại sao đây là đáp án đúng...",
-      "exerciseRequiredFields": "Vui lòng điền câu hỏi và đáp án đúng",
-      "exerciseCreated": "Bài tập đã được tạo thành công",
-      "exerciseUpdated": "Bài tập đã được cập nhật thành công",
-      "exerciseDeleted": "Bài tập đã được xóa thành công",
-      "types": {
-        "grammar": "Ngữ pháp",
-        "vocabulary": "Từ vựng",
-        "listening": "Nghe",
-        "speaking": "Nói",
-        "reading": "Đọc",
-        "writing": "Viết"
+      progress: {
+        title: "Theo dõi tiến độ",
+        description:
+          "Giám sát hành trình học tập của bạn với theo dõi tiến độ chi tiết và huy hiệu thành tích",
       },
-      "exerciseTypes": {
+    },
+  },
+  dashboard: {
+    title: "Bảng điều khiển",
+    welcome: "Chào mừng trở lại",
+    currentLevel: "Bạn đang học ở cấp độ",
+    level: "cấp độ",
+    stats: {
+      completed: "Bài học đã hoàn thành",
+      inProgress: "Đang học",
+      streak: "Chuỗi ngày",
+      totalLessons: "Tổng số bài học",
+      totalProgress: "Tiến độ tổng thể",
+      pointsEarned: "Điểm tích lũy",
+      keepItUp: "Tiếp tục nhé!",
+      badges: "Huy hiệu",
+      achievements: "thành tựu",
+    },
+    continueLearning: {
+      title: "Tiếp tục từ nơi bạn dừng lại",
+      progress: "Tiến độ",
+    },
+    courses: "Khóa học của bạn",
+    viewAll: "Xem tất cả các khóa học",
+    recommended: "Đề xuất cho bạn",
+    progress: "Tiến độ",
+    hours: "giờ",
+    topics: "chủ đề",
+    lessons: "bài học",
+    continue: "Tiếp tục học",
+    continueCourse: "Tiếp tục khóa học",
+    start: "Bắt đầu khóa học",
+  },
+  sidebar: {
+    courses: "Khóa học",
+    topics: "Chủ đề",
+    lessons: "Bài học",
+    topic: "chủ đề",
+    topics_plural: "chủ đề",
+  },
+  lesson: {
+    difficulty: "Độ khó",
+    keyPoints: "Điểm chính",
+    examples: "Ví dụ",
+    practice: "Bài tập thực hành",
+    checkAnswer: "Kiểm tra đáp án",
+    nextLesson: "Bài học tiếp theo",
+    completed: "Hoàn thành bài học!",
+    correct: "Chính xác!",
+    incorrect: "Không chính xác. Thử lại!",
+    media: "Phương tiện",
+  },
+  quiz: {
+    title: "Bài kiểm tra",
+    question: "Câu hỏi",
+    submit: "Nộp câu trả lời",
+    next: "Câu hỏi tiếp theo",
+    finish: "Hoàn thành bài kiểm tra",
+    score: "Điểm của bạn",
+    correct: "Đúng",
+    incorrect: "Sai",
+    explanation: "Giải thích",
+  },
+  progress: {
+    title: "Tiến độ của bạn",
+    overall: "Tiến độ tổng thể",
+    byTopic: "Tiến độ theo chủ đề",
+    completed: "Đã hoàn thành",
+    total: "Tổng số",
+    percentage: "Hoàn thành",
+  },
+  comments: {
+    title: "Bình luận",
+    placeholder: "Chia sẻ suy nghĩ của bạn hoặc đặt câu hỏi...",
+    submit: "Đăng bình luận",
+    noComments:
+      "Chưa có bình luận nào. Hãy là người đầu tiên bình luận!",
+    reply: "Trả lời",
+    delete: "Xóa",
+    edit: "Chỉnh sửa",
+  },
+  auth: {
+    login: {
+      title: "Đăng nhập vào TVEnglish",
+      subtitle:
+        "Chào mừng trở lại! Vui lòng đăng nhập để tiếp tục",
+      email: "Email",
+      password: "Mật khẩu",
+      button: "Đăng nhập",
+      noAccount: "Chưa có tài khoản?",
+      signupLink: "Đăng ký tại đây",
+    },
+    signup: {
+      title: "Tạo tài khoản",
+      subtitle: "Tham gia TVEnglish và bắt đầu học hôm nay",
+      name: "Họ và tên",
+      email: "Email",
+      password: "Mật khẩu",
+      confirmPassword: "Xác nhận mật khẩu",
+      button: "Đăng ký",
+      hasAccount: "Đã có tài khoản?",
+      loginLink: "Đăng nhập tại đây",
+    },
+  },
+  common: {
+    loading: "Đang tải...",
+    error: "Lỗi",
+    success: "Thành công",
+    cancel: "Hủy",
+    save: "Lưu",
+    delete: "Xóa",
+    edit: "Chỉnh sửa",
+    close: "Đóng",
+    back: "Quay lại",
+    next: "Tiếp theo",
+    previous: "Trước",
+    search: "Tìm kiếm",
+    filter: "Lọc",
+    all: "Tất cả",
+    none: "Không có",
+  },
+  courses: {
+    a1: {
+      title: "Người mới bắt đầu (A1)",
+      description:
+        "Bắt đầu hành trình học tiếng Anh của bạn! Nắm vững các câu chào hỏi cơ bản, câu đơn giản và từ vựng hàng ngày.",
+    },
+    a2: {
+      title: "Sơ cấp (A2)",
+      description:
+        "Xây dựng dựa trên kiến thức cơ bản của bạn! Học các thì quá khứ, các câu phức tạp hơn và mở rộng vốn từ vựng của bạn.",
+    },
+    b1: {
+      title: "Trung cấp (B1)",
+      description:
+        "Trở thành người dùng độc lập! Nắm vững ngữ pháp phức tạp, thảo luận các chủ đề trừu tượng và cải thiện sự trôi chảy.",
+    },
+    b2: {
+      title: "Trên trung cấp (B2)",
+      description:
+        "Đạt được trình độ nâng cao! Xử lý các cuộc thảo luận phức tạp, hiểu ngôn ngữ có sắc thái và diễn đạt trôi chảy.",
+    },
+  },
+  account: {
+    title: "Cài đặt Tài khoản",
+    subtitle: "Quản lý hồ sơ và xem tiến trình học tập của bạn",
+    edit: "Chỉnh sửa Hồ sơ",
+    saved: "Hồ sơ đã được cập nhật thành công!",
+    memberFor: "Thành viên từ",
+    quickStats: "Thống kê Nhanh",
+    progressOverview: "Tổng Quan về Tiến trình",
+    courseProgress: "Tiến trình Khóa học",
+    fields: {
+      username: "Tên người dùng",
+      email: "Email",
+      phone: "Số điện thoại",
+      birthdate: "Ngày sinh",
+      sex: "Giới tính",
+    },
+    placeholders: {
+      phone: "ví dụ: +1 234 567 8900",
+      sex: "Chọn giới tính",
+    },
+    sexOptions: {
+      male: "Nam",
+      female: "Nữ",
+      other: "Khác",
+      preferNotToSay: "Không muốn nói",
+    },
+    errors: {
+      requiredFields: "Tên người dùng và email là bắt buộc",
+      invalidEmail: "Vui lòng nhập địa chỉ email hợp lệ",
+    },
+    stats: {
+      streak: "Chuỗi học tp",
+      completed: "Đã hoàn thành",
+      topics: "Chủ đề đã hoàn thành",
+      avgScore: "Điểm trung bình",
+      overall: "Tiến độ tổng thể",
+      currentStreak: "Chuỗi hiện tại",
+      daysInARow: "ngày liên tiếp",
+      timeSpent: "Thời gian đã dành",
+      totalMinutes: "tổng số phút",
+      wordsLearned: "Từ đã học",
+      vocabulary: "từ vựng",
+      lessonsCompleted: "bài học đã hoàn thành",
+      new: "Thành viên mới",
+      days: "ngày",
+      weeks: "tuần",
+      months: "tháng",
+      years: "năm",
+    },
+  },
+  coach: {
+    title: "Huấn luyện viên AI tiếng Anh",
+    subtitle:
+      "Nhận trợ giúp cá nhân hóa cho hành trình học tiếng Anh của bạn",
+    badge: "Có sẵn 24/7",
+    welcome:
+      "Xin chào! Tôi là Huấn luyện viên AI tiếng Anh của bạn. Tôi ở đây để giúp bạn cải thiện kỹ năng tiếng Anh. Bạn có thể hỏi tôi về ngữ pháp, từ vựng, phát âm hoặc bất kỳ chủ đề học tiếng Anh nào khác. Tôi có thể giúp gì cho bn hôm nay?",
+    quickStart: "Gợi ý bắt đầu nhanh:",
+    inputPlaceholder:
+      "Nhập câu hỏi của bạn ở đây... (Nhấn Enter để gửi)",
+    disclaimer:
+      "Lưu ý: Đây là một huấn luyện viên AI mô phỏng. Để có trải nghiệm học tập tốt nhất, hãy thực hành thường xuyên và xem lại các bài học.",
+    prompts: {
+      grammar: "Giúp tôi với ngữ pháp tiếng Anh",
+      conversation: "Thực hành hội thoại với tôi",
+      tips: "Cho tôi lời khuyên học tập",
+    },
+    responses: {
+      grammar:
+        "Câu hỏi hay về ngữ pháp! Ngữ pháp tiếng Anh có thể khó, nhưng với thực hành, nó sẽ dễ dàng hơn. Đây là một số mẹo:\n\n1. Tập trung vào các thì - Hiện tại, Quá khứ và Tương lai\n2. Thực hành với cấu trúc câu - Chủ ngữ + Động từ + Tân ngữ\n3. Học các động từ bất quy tắc phổ biến\n4. Chú ý đến mạo từ (a, an, the)\n\nBạn muốn làm việc với chủ đề ngữ pháp cụ thể nào? Tôi có thể cung cấp giải thích và ví dụ chi tiết hơn!",
+      vocabulary:
+        "Xây dựng từ vựng là điều cần thiết! Đây là một số chiến lược hiệu quả:\n\n1. Học từ trong ngữ cảnh, không riêng lẻ\n2. Sử dụng thẻ ghi nhớ hoặc ứng dụng lặp lại có khoảng cách\n3. Đọc nội dung tiếng Anh thường xuyên\n4. Thực hành sử dụng từ mới trong câu\n5. Nhóm từ theo chủ đ��\n\nBạn có muốn tôi đề xuất một số bài tập từ vựng dựa trên trình độ hiện tại của bạn không?",
+      practice:
+        "Thực hành là chìa khóa để làm chủ tiếng Anh! Đây là một số cách để thực hành:\n\n1. Hoàn thành các bài tập sau mỗi bài học\n2. Cố gắng nói tiếng Anh hàng ngày, ngay cả với chính bạn\n3. Viết đoạn văn ngắn về ngày của bạn\n4. Xem video tiếng Anh với phụ đề\n5. Tham gia cộng đồng trao đổi ngôn ngữ\n\nBạn muốn tập trung vào kỹ năng nào: nói, viết, nghe hay đọc?",
+      pronunciation:
+        "Phát âm có thể là thách thức, nhưng đây là một số mẹo:\n\n1. Nghe người bản ngữ và bắt chước họ\n2. Ghi âm bản thân và so sánh\n3. Thực hành các âm khó lặp đi lặp lại\n4. Học bảng chữ cái phiên âm\n5. Tập trung vào trọng âm từ và ngữ điệu\n\nBạn có muốn thực hành một số âm hoặc từ cụ thể không?",
+      study:
+        "Đây là một số mẹo học tập hiệu quả để học tiếng Anh:\n\n1. Học đều đặn - 30 phút mỗi ngày tốt hơn 3 giờ mỗi tuần một lần\n2. Đặt mục tiêu cụ thể, có thể đạt được\n3. Sử dụng nhiều nguồn tài nguyên (video, sách, ứng dụng)\n4. Thực hành cả bốn kỹ năng: đọc, viết, nghe, nói\n5. Xem lại thường xuyên để củng cố việc học\n6. Đừng ngại mắc lỗi!\n\nMục tiêu học tập hiện tại của bạn là gì? Tôi có thể giúp bạn tạo kế hoạch học tập!",
+      default:
+        "Đó là một câu hỏi thú vị! Tôi ở đây để giúp bạn với:\n\n• Quy tắc và giải thích ngữ pháp\n• Xây dựng từ vựng\n• Mẹo phát âm\n• Chiến lược học tập\n• Bài tập thực hành\n• Thực hành hội thoại\n\nBạn có thể cho tôi biết cụ thể hơn về những gì bạn muốn học hoặc thực hành không? Càng nhiều chi tiết bạn cung cấp, tôi càng có thể hỗ trợ bạn tốt hơn!",
+    },
+  },
+  admin: {
+    title: "Bảng quản trị",
+    subtitle: "Quản lý người dùng và nội dung",
+    role: "Vai trò",
+    userManagement: "Quản lý Người dùng",
+    contentManagement: "Quản lý Nội dung",
+    accessDenied: "Truy cập bị từ chối",
+    accessDeniedMessage:
+      "Bạn không có quyền truy cập bảng quản trị.",
+    roles: {
+      user: "Người dùng",
+      moderator: "Người kiểm duyệt",
+      admin: "Quản trị viên",
+    },
+    users: {
+      searchPlaceholder:
+        "Tìm kiếm theo tên người dùng hoặc email...",
+      filterByRole: "Lọc theo vai trò",
+      filterByStatus: "Lọc theo trạng thái",
+      allRoles: "Tất cả vai trò",
+      allStatuses: "Tất cả trạng thái",
+      active: "Đang hoạt động",
+      inactive: "Không hoạt động",
+      totalUsers: "Tổng số người dùng",
+      activeUsers: "Người dùng đang hoạt động",
+      moderators: "Người kiểm duyệt",
+      admins: "Quản trị viên",
+      username: "Tên người dùng",
+      email: "Email",
+      role: "Vai trò",
+      status: "Trạng thái",
+      progress: "Tiến độ",
+      actions: "Hành động",
+      lessons: "bài học",
+      dayStreak: "chuỗi ngày",
+      learningStats: "Thống kê Học tập",
+      statsDescription:
+        "Xem tiến độ học tập chi tiết và thống kê",
+      lessonsCompleted: "Bài học đã hoàn thành",
+      studyStreak: "Chuỗi học tập",
+      days: "ngày",
+      avgScore: "Điểm trung bình",
+      joinDate: "Ngày tham gia",
+      changeRole: "Thay đổi Vai trò Người dùng",
+      changeRoleDescription:
+        "Cập nhật quyền và cấp độ truy cập",
+      currentRole: "Vai trò hiện tại",
+      activated:
+        "Người dùng {{username}} đã được kích hoạt thành công",
+      deactivated:
+        "Người dùng {{username}} đã bị vô hiệu hóa thành công",
+      roleChanged:
+        "Vai trò đã được thay đổi thành {{role}} cho {{username}}",
+      onlyAdminCanChangeRoles:
+        "Chỉ quản trị viên mới có thể thay đổi vai trò người dùng",
+    },
+    content: {
+      lessonManagement: "Quản lý Bài học",
+      lessonManagementDesc: "Tạo, chỉnh sửa và sắp xếp bài học",
+      createLesson: "Tạo Bài hc Mới",
+      editLesson: "Chỉnh sửa Bài học",
+      searchLessons: "Tìm kiếm bài học...",
+      filterByDifficulty: "Lọc theo độ khó",
+      filterByType: "Lọc theo loại",
+      allDifficulties: "Tất cả độ khó",
+      allTypes: "Tất cả loại",
+      course: "Khóa học",
+      topic: "Chủ đề",
+      selectCourse: "Chọn khóa học",
+      selectTopic: "Chọn chủ đề",
+      totalLessons: "Tổng số Bài học",
+      published: "Đã xuất bản",
+      drafts: "Bản nháp",
+      exercises: "Bài tập",
+      draft: "Bản nháp",
+      topicSection: "Chọn Chủ đề",
+      createNewTopic: "Tạo Chủ đề Mới",
+      selectExistingTopic: "Dùng Chủ đề Có sẵn",
+      existingTopic: "Chủ đề Hiện có",
+      selectCourseFirst: "Vui lòng chọn khóa học trước",
+      topicName: "Tên Chủ đề",
+      topicNamePlaceholder: "ví dụ: Giao tiếp Kinh doanh",
+      topicDescription: "Mô tả Chủ đề",
+      topicDescriptionPlaceholder:
+        "Mô tả ngắn gọn về chủ đề này...",
+      topicIcon: "Biểu tượng Chủ đề (Emoji)",
+      topicIconHint: "Nhập một emoji đại diện cho chủ đề này",
+      hasVideo: "Có Video",
+      hasAudio: "Có Audio",
+      addExercise: "Thêm Bài tập",
+      editExercise: "Chỉnh sửa Bài tập",
+      lessonFormDescription:
+        "Điền thông tin chi tiết bài học bên dưới",
+      exerciseFormDescription:
+        "Tạo bài tập tương tác cho bài học này",
+      lessonTitle: "Tiêu đề Bài học",
+      lessonTitlePlaceholder: "ví dụ: Thì Hiện tại Đơn",
+      description: "Mô tả",
+      descriptionPlaceholder: "Mô tả ngắn gọn về bài học...",
+      difficulty: "Mức độ Khó",
+      type: "Loại Bài học",
+      lessonContent: "Nội dung Bài học",
+      contentPlaceholder:
+        "Viết nội dung chính của bài học ở đây...",
+      videoUrl: "URL Video (Tùy chọn)",
+      audioUrl: "URL Audio (Tùy chọn)",
+      status: "Trạng thái",
+      create: "Tạo",
+      requiredFields:
+        "Vui lòng điền tất cả các trường bắt buộc",
+      lessonCreated: "Bài học đã được tạo thành công",
+      lessonUpdated: "Bài học đã được cập nhật thành công",
+      lessonDeleted: "Bài học đã được xóa thành công",
+      confirmDelete:
+        "Bạn có chắc chắn muốn xóa bài học này không?",
+      exerciseType: "Loại Bài tập",
+      question: "Câu hỏi",
+      questionPlaceholder: "Nhập câu hỏi bài tập...",
+      options: "Tùy chọn Trả lời",
+      option: "Tùy chọn",
+      correctAnswer: "Đáp án Đúng",
+      correctAnswerPlaceholder: "Nhập đáp án đúng...",
+      explanation: "Giải thích (Tùy chọn)",
+      explanationPlaceholder:
+        "Giải thích tại sao đây là đáp án đúng...",
+      exerciseRequiredFields:
+        "Vui lòng điền câu hỏi và đáp án đúng",
+      exerciseCreated: "Bài tập đã được tạo thành công",
+      exerciseUpdated: "Bài tập đã được cập nhật thành công",
+      exerciseDeleted: "Bài tập đã được xóa thành công",
+      types: {
+        grammar: "Ngữ pháp",
+        vocabulary: "Từ vựng",
+        listening: "Nghe",
+        speaking: "Nói",
+        reading: "Đọc",
+        writing: "Viết",
+      },
+      exerciseTypes: {
         "multiple-choice": "Trắc nghiệm",
         "fill-blank": "Điền vào chỗ trống",
-        "true-false": "Đúng/Sai"
-      }
-    }
-  }
+        "true-false": "Đúng/Sai",
+      },
+    },
+  },
 };
 
-i18n
-  .use(initReactI18next)
-  .init({
-    resources: {
-      en: { translation: en },
-      vi: { translation: vi }
-    },
-    lng: localStorage.getItem('language') || 'en',
-    fallbackLng: 'en',
-    interpolation: {
-      escapeValue: false
-    }
-  });
+i18n.use(initReactI18next).init({
+  resources: {
+    en: { translation: en },
+    vi: { translation: vi },
+  },
+  lng: localStorage.getItem("language") || "en",
+  fallbackLng: "en",
+  interpolation: {
+    escapeValue: false,
+  },
+});
 
 export default i18n;

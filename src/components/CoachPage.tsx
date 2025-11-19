@@ -10,6 +10,7 @@ import {
   Plus
 } from "lucide-react";
 import { useTranslation } from 'react-i18next';
+import React from "react";
 
 interface Message {
   id: string;

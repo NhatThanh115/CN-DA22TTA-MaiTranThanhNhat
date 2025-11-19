@@ -1,25 +1,19 @@
-import { 
-  BookOpen, 
-  Languages, 
-  Mic, 
-  Headphones, 
-  Home, 
-  ChevronDown, 
-  ChevronRight, 
-  BarChart3,
-  MessageCircle,
-  Briefcase,
-  Plane,
-  Heart,
-  GraduationCap,
-  CheckCircle2
-} from "lucide-react";
 import { useState, useEffect } from "react";
-import { topics, lessons, courses, type Course } from "../data/lessons";
+import { topics, courses } from "../data/courses";
 import { TopicProgressBar } from "./TopicProgressBar";
 import { getUserProgress, updateAllTopicProgress, isLessonCompleted } from "../utils/progressTracker";
 import { Badge } from "./ui/badge";
 import { useTranslation } from 'react-i18next';
+import { 
+  MessageCircle, 
+  Heart, 
+  Plane, 
+  Briefcase, 
+  BookOpen, 
+  CheckCircle2, 
+  ChevronRight 
+} from "lucide-react";
+import React from "react";
 
 interface SidebarProps {
   currentView: string;
@@ -112,10 +106,10 @@ export function Sidebar({ currentView, onNavigate, selectedCourse }: SidebarProp
           </div>
           <nav className="space-y-1">
             {courses.map((course) => {
-              const courseTopics = topics.filter(t => course.topics.includes(t.id));
+              const courseTopics = course.topics; // Already Topic objects in hierarchical structure
               const totalLessons = courseTopics.reduce((acc, t) => acc + t.lessons.length, 0);
               const completedLessons = courseTopics.reduce((acc, t) => {
-                return acc + t.lessons.filter(lessonId => isLessonCompleted(lessonId)).length;
+                return acc + t.lessons.filter(lesson => isLessonCompleted(lesson.id)).length;
               }, 0);
               const isCompleted = totalLessons > 0 && completedLessons === totalLessons;
               const isExpanded = expandedCourses.includes(course.id);
@@ -132,7 +126,7 @@ export function Sidebar({ currentView, onNavigate, selectedCourse }: SidebarProp
                       <span className="text-lg">{getCourseEmoji(course.level)}</span>
                       <div className="flex-1 text-left">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm">{course.title}</span>
+                          <span className="text-sm">{t(course.titleKey)}</span>
                           {isCompleted && (
                             <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
                           )}
@@ -199,43 +193,29 @@ export function Sidebar({ currentView, onNavigate, selectedCourse }: SidebarProp
                                   </div>
                                 )}
                                 {/* Lessons for this topic */}
-                                {topic.lessons.map((lessonId) => {
-                                  const completed = isLessonCompleted(lessonId);
-                                  const lesson = lessons[lessonId];
-                                  const difficulty = lesson?.difficulty;
-                                  const lessonLabel = lessonId
+                                {topic.lessons.map((lesson) => {
+                                  const completed = isLessonCompleted(lesson.id);
+                                  const lessonLabel = lesson.id
                                     .split('-')
                                     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
                                     .join(' ');
                                   
                                   return (
                                     <button
-                                      key={lessonId}
-                                      onClick={() => onNavigate(lessonId)}
+                                      key={lesson.id}
+                                      onClick={() => onNavigate(lesson.id)}
                                       className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm transition-all flex items-center justify-between group ${
-                                        currentView === lessonId
+                                        currentView === lesson.id
                                           ? "bg-[#288f8a] text-white shadow-sm"
                                           : "hover:bg-gray-100"
                                       }`}
                                     >
                                       <div className="flex items-center gap-2 flex-1">
                                         <span className="flex-1 text-xs">{lessonLabel}</span>
-                                        {difficulty && (
-                                          <Badge 
-                                            variant="outline" 
-                                            className={`text-xs px-1 py-0 ${
-                                              currentView === lessonId 
-                                                ? "border-white/50 text-white" 
-                                                : ""
-                                            }`}
-                                          >
-                                            {difficulty}
-                                          </Badge>
-                                        )}
                                       </div>
                                       {completed && (
                                         <CheckCircle2 className={`w-3 h-3 ml-1 ${
-                                          currentView === lessonId ? "text-white" : "text-green-600"
+                                          currentView === lesson.id ? "text-white" : "text-green-600"
                                         }`} />
                                       )}
                                     </button>
