@@ -1,0 +1,258 @@
+import { getPool, sql } from "../config/database.ts";
+import { hash, compare, genSalt } from "bcrypt";
+import type { ApiResponse, User } from "../types/index.ts";
+import { create } from "djwt";
+import { jwtKey } from "../middleware/auth.ts";
+
+const SALT_ROUNDS = 10;
+
+/**
+ * Register a new user
+ */
+export async function registerUser(
+  username: string,
+  email: string,
+  password: string,
+  full_name?: string,
+): Promise<ApiResponse<User>> {
+  try {
+    const pool = await getPool();
+
+    // Check if user already exists
+    const existingUser = await pool.request()
+      .input("email", sql.NVarChar(255), email)
+      .input("username", sql.NVarChar(50), username)
+      .query(`
+        SELECT id FROM users
+        WHERE email = @email OR username = @username
+      `);
+
+    if (existingUser.recordset.length > 0) {
+      return {
+        success: false,
+        error: "User with this email or username already exists",
+      };
+    }
+
+    // Hash password
+    const salt = await genSalt(SALT_ROUNDS);
+    const password_hash = await hash(password, salt);
+
+    // Insert new user
+    const result = await pool.request()
+      .input("username", sql.NVarChar(50), username)
+      .input("email", sql.NVarChar(255), email)
+      .input("password_hash", sql.NVarChar(255), password_hash)
+      .input("full_name", sql.NVarChar(100), full_name || null)
+      .query(`
+        INSERT INTO users (username, email, password_hash, full_name)
+        VALUES (@username, @email, @password_hash, @full_name);
+
+        SELECT id, username, email, full_name, created_at, updated_at, is_active, is_verified
+        FROM users
+        WHERE email = @email;
+      `);
+
+    const newUser = result.recordset[0];
+
+    // Assign default student role
+    await pool.request()
+      .input("user_id", sql.UniqueIdentifier, newUser.id)
+      .query(`
+        INSERT INTO user_role_assignments (user_id, role_id)
+        SELECT @user_id, id FROM user_roles WHERE role_name = 'student'
+      `);
+
+    return {
+      success: true,
+      message: "User registered successfully",
+      data: newUser,
+    };
+  } catch (error) {
+    console.error("Error registering user:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+/**
+ * Login user
+ */
+export async function loginUser(
+  email: string,
+  password: string,
+): Promise<ApiResponse<User>> {
+  try {
+    const pool = await getPool();
+
+    // Get user by email or username, including their role
+    const result = await pool.request()
+      .input("email_or_username", sql.NVarChar(255), email)
+      .query(`
+        SELECT u.*, r.role_name as role
+        FROM users u
+        LEFT JOIN user_role_assignments ura ON u.id = ura.user_id
+        LEFT JOIN user_roles r ON ura.role_id = r.id
+        WHERE (u.email = @email_or_username OR u.username = @email_or_username) AND u.is_active = 1
+      `);
+
+    if (result.recordset.length === 0) {
+      return {
+        success: false,
+        error: "Invalid email or password",
+      };
+    }
+
+    const user = result.recordset[0];
+
+    // Verify password
+    const isPasswordValid = await compare(password, user.password_hash);
+
+    if (!isPasswordValid) {
+      return {
+        success: false,
+        error: "Invalid email or password",
+      };
+    }
+
+    // Update last login
+    await pool.request()
+      .input("user_id", sql.UniqueIdentifier, user.id)
+      .query(`
+        UPDATE users SET last_login = GETDATE() WHERE id = @user_id
+      `);
+
+    // Remove password_hash from response but keep role
+    const { password_hash: _, ...userWithoutPassword } = user;
+
+    // Generate JWT with role included
+    const jwt = await create(
+      { alg: "HS512", typ: "JWT" }, 
+      { id: user.id, email: user.email, role: user.role || 'user' }, 
+      jwtKey
+    );
+
+    return {
+      success: true,
+      message: "Login successful",
+      data: userWithoutPassword,
+      // @ts-ignore: Extending response with token
+      token: jwt,
+    };
+  } catch (error) {
+    console.error("Error logging in user:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+/**
+ * Get user by ID
+ */
+export async function getUserById(userId: string): Promise<ApiResponse<User>> {
+  try {
+    const pool = await getPool();
+
+    const result = await pool.request()
+      .input("user_id", sql.UniqueIdentifier, userId)
+      .query(`
+        SELECT id, username, email, full_name, date_of_birth, country,
+               preferred_language, created_at, updated_at, last_login,
+               is_active, is_verified, profile_picture_url
+        FROM users
+        WHERE id = @user_id
+      `);
+
+    if (result.recordset.length === 0) {
+      return {
+        success: false,
+        error: "User not found",
+      };
+    }
+
+    return {
+      success: true,
+      data: result.recordset[0],
+    };
+  } catch (error) {
+    console.error("Error getting user:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+/**
+ * Update user profile
+ */
+export async function updateUser(
+  userId: string,
+  updates: Partial<User>,
+): Promise<ApiResponse<User>> {
+  try {
+    const pool = await getPool();
+
+    const allowedFields = [
+      "full_name",
+      "date_of_birth",
+      "country",
+      "preferred_language",
+      "profile_picture_url",
+    ];
+
+    const updateParts: string[] = [];
+    const request = pool.request();
+
+    request.input("user_id", sql.UniqueIdentifier, userId);
+
+    Object.entries(updates).forEach(([key, value]) => {
+      if (allowedFields.includes(key)) {
+        updateParts.push(`${key} = @${key}`);
+
+        if (key === "date_of_birth") {
+          request.input(key, sql.Date, value);
+        } else {
+          request.input(key, sql.NVarChar, value);
+        }
+      }
+    });
+
+    if (updateParts.length === 0) {
+      return {
+        success: false,
+        error: "No valid fields to update",
+      };
+    }
+
+    const query = `
+      UPDATE users
+      SET ${updateParts.join(", ")}, updated_at = GETDATE()
+      WHERE id = @user_id;
+
+      SELECT id, username, email, full_name, date_of_birth, country,
+             preferred_language, created_at, updated_at, last_login,
+             is_active, is_verified, profile_picture_url
+      FROM users
+      WHERE id = @user_id;
+    `;
+
+    const result = await request.query(query);
+
+    return {
+      success: true,
+      message: "User updated successfully",
+      data: result.recordset[0],
+    };
+  } catch (error) {
+    console.error("Error updating user:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}

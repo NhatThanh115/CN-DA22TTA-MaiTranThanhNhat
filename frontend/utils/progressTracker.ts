@@ -16,11 +16,38 @@ export interface UserProgress {
   timeSpent: Record<string, number>; // lessonId -> minutes
 }
 
-const STORAGE_KEY = 'tvenglish_user_progress';
+const STORAGE_KEY_PREFIX = 'tvenglish_progress_';
+const CURRENT_USER_KEY = 'tvenglish_current_user';
+
+// Get the current logged-in username from localStorage
+function getCurrentUser(): string | null {
+  return localStorage.getItem(CURRENT_USER_KEY);
+}
+
+// Set the current logged-in username (call this on login)
+export function setCurrentUser(username: string): void {
+  localStorage.setItem(CURRENT_USER_KEY, username);
+}
+
+// Clear the current user (call this on logout)
+export function clearCurrentUser(): void {
+  localStorage.removeItem(CURRENT_USER_KEY);
+}
+
+// Get the storage key for the current user
+function getStorageKey(): string {
+  const user = getCurrentUser();
+  if (!user) {
+    // Fallback for anonymous/guest users
+    return `${STORAGE_KEY_PREFIX}guest`;
+  }
+  return `${STORAGE_KEY_PREFIX}${user}`;
+}
 
 // Initialize or get user progress from localStorage
 export function getUserProgress(): UserProgress {
-  const stored = localStorage.getItem(STORAGE_KEY);
+  const storageKey = getStorageKey();
+  const stored = localStorage.getItem(storageKey);
   
   if (stored) {
     try {
@@ -50,7 +77,8 @@ export function getUserProgress(): UserProgress {
 // Save user progress to localStorage
 export function saveUserProgress(progress: UserProgress): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    const storageKey = getStorageKey();
+    localStorage.setItem(storageKey, JSON.stringify(progress));
     // Emit custom event for same-tab updates
     window.dispatchEvent(new CustomEvent('progressUpdated'));
   } catch (error) {
@@ -60,7 +88,7 @@ export function saveUserProgress(progress: UserProgress): void {
 
 // Calculate topic progress based on completed lessons
 export function calculateTopicProgress(
-  topicId: string,
+  _topicId: string,
   topicLessons: string[],
   completedLessons: string[]
 ): { completed: number; total: number; percentage: number } {
@@ -101,13 +129,17 @@ export function updateAllTopicProgress(
 }
 
 // Mark a lesson as completed
-export function markLessonComplete(
+// Mark a lesson as completed
+export async function markLessonComplete(
   lessonId: string,
   topicId: string,
-  topicLessons: string[]
-): void {
+  topicLessons: string[], // Keeping this for signature compatibility, though backend might not need it if it queries DB
+  courseId: string, // Needed for backend
+  timeSpentMinutes: number = 0
+): Promise<void> {
   const progress = getUserProgress();
   
+  // Optimistically update local state
   if (!progress.completedLessons.includes(lessonId)) {
     progress.completedLessons.push(lessonId);
     updateStudyStreak(progress);
@@ -120,6 +152,20 @@ export function markLessonComplete(
     );
     
     saveUserProgress(progress);
+  }
+
+  // Call Backend API
+  try {
+      const { api } = await import("./api");
+      await api.progress.completeLesson({
+          lesson_id: lessonId,
+          topic_id: topicId,
+          course_id: courseId, 
+          time_spent_minutes: timeSpentMinutes
+      });
+  } catch (err) {
+      console.error("Failed to sync progress to backend:", err);
+      // We could revert local state here if strict consistency is needed
   }
 }
 
@@ -193,5 +239,6 @@ export function getTopicProgress(topicId: string): { completed: number; total: n
 
 // Reset all progress (for testing or user request)
 export function resetProgress(): void {
-  localStorage.removeItem(STORAGE_KEY);
+  const storageKey = getStorageKey();
+  localStorage.removeItem(storageKey);
 }

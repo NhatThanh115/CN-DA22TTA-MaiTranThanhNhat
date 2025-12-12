@@ -1,0 +1,52 @@
+services:
+  db:
+    image: mcr.microsoft.com/azure-sql-edge:latest
+    user: root
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=TestPass@123
+      - SA_PASSWORD=TestPass@123
+    ports:
+      - "59751:1433"
+    volumes:
+      - db-data:/var/opt/mssql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+      - ./database/seed.sql:/docker-entrypoint-initdb.d/seed.sql:ro
+      - ./database/entrypoint.sh:/entrypoint.sh:ro
+    entrypoint: [ "/bin/bash", "/entrypoint.sh" ]
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "$$SA_PASSWORD" -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_SERVER=db
+      - DB_PORT=1433
+      - DB_DATABASE=tvenglish
+      - DB_USER=sa
+      - DB_PASSWORD=TestPass@123
+      - DB_ENCRYPT=true
+      - DB_TRUST_SERVER_CERTIFICATE=true
+      - PORT=8000
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: . # Ensure this is where your Frontend code lives
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  db-data:

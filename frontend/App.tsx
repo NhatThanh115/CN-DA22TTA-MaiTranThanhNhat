@@ -19,12 +19,13 @@ import './i18n/config';
 
 // Data
 import { lessons, topics, courses, getCourseByLessonId } from "./data/courses";
-import { getUserProgress, updateAllTopicProgress } from "./utils/progressTracker";
+import { getUserProgress, setCurrentUser, clearCurrentUser } from "./utils/progressTracker";
 import { createUserProfile, getUserProfile, clearUserProfile } from "./utils/userProfile";
+import { getAuthToken, removeAuthToken } from "./utils/api";
 
 // UI Components
 import { Input } from "./components/ui/input";
-import { Button } from "./components/ui/button";
+
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -51,7 +52,7 @@ import { AdminPage } from "./components/AdminPage";
 import { ContentSection } from "./components/ContentSection";
 import { CreateLessonPage } from "./components/CreateLessonPage";
 import { CreateTopicPage } from "./components/CreateTopicPage";
-import React from "react";
+
 
 export default function App() {
   const { t } = useTranslation();
@@ -60,7 +61,26 @@ export default function App() {
   const [user, setUser] = useState<{ username: string; email?: string; role?: string } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const progress = getUserProgress();
+
+  // Restore session on page load
+  useEffect(() => {
+    const token = getAuthToken();
+    const profile = getUserProfile();
+    
+    if (token && profile) {
+      // Restore user session from localStorage
+      setCurrentUser(profile.username);
+      setUser({
+        username: profile.username,
+        email: profile.email,
+        role: profile.role || 'user'
+      });
+      setCurrentView("home");
+    }
+    setIsLoading(false);
+  }, []);
 
   // Determine current course based on the current view
   const getCurrentCourse = () => {
@@ -98,20 +118,29 @@ export default function App() {
     currentView !== "create-topic" &&
     !isCourseView;
 
-  const handleLogin = (username: string) => {
-    const profile = getUserProfile();
-    const role = profile?.role || 'user';
-    setUser({ username, role });
+  const handleLogin = (username: string, role: string) => {
+    // Set current user for progress tracking
+    setCurrentUser(username);
     
+    // Cast role to proper type (backend returns 'admin', 'student', 'moderator', etc.)
+    const typedRole = (role === 'admin' || role === 'moderator') ? role : 'user' as const;
+    setUser({ username, role: typedRole });
+    
+    // Update local profile with role from backend
+    const profile = getUserProfile();
     if (!profile) {
-      createUserProfile(username, '', { 
-        role: username.toLowerCase() === 'admin' ? 'admin' : 'user' 
-      });
+      createUserProfile(username, '', { role: typedRole });
+    } else if (profile.role !== typedRole) {
+      // Update role if it changed
+      createUserProfile(username, profile.email || '', { ...profile, role: typedRole });
     }
     setCurrentView("home");
   };
 
   const handleSignUp = (username: string, email: string) => {
+    // Set current user for progress tracking
+    setCurrentUser(username);
+    
     const role = username.toLowerCase() === 'admin' ? 'admin' : 'user';
     setUser({ username, email, role });
     createUserProfile(username, email, { role });
@@ -119,6 +148,11 @@ export default function App() {
   };
 
   const handleLogout = () => {
+    // Clear current user for progress tracking
+    clearCurrentUser();
+    // Remove auth token
+    removeAuthToken();
+    
     setUser(null);
     clearUserProfile();
     setCurrentView("welcome");

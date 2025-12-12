@@ -35,7 +35,7 @@ export function SignUpPage({ onSignUp, onNavigateToLogin, onNavigateToHome }: Si
   const [isLoading, setIsLoading] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!username || !email || !password || !confirmPassword) {
@@ -65,12 +65,35 @@ export function SignUpPage({ onSignUp, onNavigateToLogin, onNavigateToHome }: Si
 
     setIsLoading(true);
     
-    // Simulate sign up
-    setTimeout(() => {
+    try {
+      // Call API to register user
+      // Note: We're not automatically logging in here, but we could if the API returned a token.
+      // Usually after signup, we ask user to login or redirect to login.
+      // Based on API signature: register(body: any)
+      const response: any = await import("../utils/api").then(m => m.api.auth.register({
+        username,
+        email,
+        password,
+        // full_name is optional in backend, not constructing it here yet
+      }));
+
+      // Assuming verifying response success in API utility or here
+      // The API utility throws if !response.ok, so if we get here, it succeeded.
+      // But let's check response.success if it returns a wrapper.
+      if (response.success) {
+          toast.success(`Account created! Welcome, ${username}! 🎉`);
+          // Optionally log them in immediately if token is present, OR redirect to login.
+          // For now, let's call onSignUp which might just set state or navigate.
+          onSignUp(username, email);
+      } else {
+          toast.error(response.error || "Registration failed");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(error instanceof Error ? error.message : "Registration failed. Please try again.");
+    } finally {
       setIsLoading(false);
-      toast.success(`Welcome to TVEnglish, ${username}! 🎉`);
-      onSignUp(username, email);
-    }, 1500);
+    }
   };
 
   const passwordStrength = password.length >= 8 ? "Strong" : password.length >= 6 ? "Medium" : password.length > 0 ? "Weak" : "";

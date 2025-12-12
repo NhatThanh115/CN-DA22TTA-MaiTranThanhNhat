@@ -1,0 +1,19 @@
+{
+  "tasks": {
+    "dev": "deno run --allow-net --allow-env --allow-read --allow-ffi --allow-sys --unstable-ffi --watch src/main.ts",
+    "start": "deno run --allow-net --allow-env --allow-read --allow-ffi --allow-sys --unstable-ffi src/main.ts",
+    "seed": "deno run --allow-net --allow-env --allow-read --allow-ffi --allow-sys --unstable-ffi src/scripts/seed.ts"
+  },
+  "imports": {
+    "@oak/oak": "jsr:@oak/oak@^17",
+    "@std/dotenv": "jsr:@std/dotenv@^0.225",
+    "mssql": "npm:mssql@^11.0.1",
+    "bcrypt": "https://deno.land/x/bcrypt@v0.4.1/mod.ts",
+    "cors": "https://deno.land/x/cors@v1.2.2/mod.ts",
+    "djwt": "https://deno.land/x/djwt@v3.0.1/mod.ts"
+  },
+  "compilerOptions": {
+    "strict": true,
+    "lib": ["deno.window"]
+  }
+}

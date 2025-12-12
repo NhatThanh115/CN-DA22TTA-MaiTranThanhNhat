@@ -1,15 +1,26 @@
 import { useTranslation } from 'react-i18next';
 import { Button } from './ui/button';
 import { Globe } from 'lucide-react';
-import React from 'react';
 
 export function LanguageSwitcher() {
   const { i18n } = useTranslation();
 
   const toggleLanguage = () => {
-    const newLang = i18n.language === 'en' ? 'vi' : 'en';
+    let newLang = 'en';
+    if (i18n.language === 'en') newLang = 'vi';
+    else if (i18n.language === 'vi') newLang = 'km';
+    else newLang = 'en';
+
     i18n.changeLanguage(newLang);
     localStorage.setItem('language', newLang);
+  };
+
+  const getLabel = () => {
+    switch(i18n.language) {
+      case 'vi': return 'VI';
+      case 'km': return 'KM';
+      default: return 'EN';
+    }
   };
 
   return (
@@ -20,7 +31,7 @@ export function LanguageSwitcher() {
       className="flex items-center gap-2"
     >
       <Globe className="w-4 h-4" />
-      <span>{i18n.language === 'en' ? 'VI' : 'EN'}</span>
+      <span>{getLabel()}</span>
     </Button>
   );
 }

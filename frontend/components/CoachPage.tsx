@@ -79,7 +79,7 @@ export function CoachPage() {
 
       // 3. Initialize Model with System Instruction
       const model = genAI.getGenerativeModel({ 
-        model: "gemini-2.0-flash",
+        model: "gemini-2.5-flash-lite",
         systemInstruction: "Bạn là một huấn luyện viên tiếng Anh thân thiện và luôn khích lệ. Mục tiêu của bạn là giúp người dùng cải thiện kỹ năng tiếng Anh thông qua giao tiếp, sửa lỗi ngữ pháp và các mẹo hữu ích. Hãy giữ cho câu trả lời của bạn ngắn gọn và dễ hiểu."
       });
 

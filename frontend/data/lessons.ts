@@ -35,6 +35,15 @@ export const a1_greetings_lessons: Lesson[] = [
     id: "greetings-basic",
     title: "Basic Greetings",
     description: "Learn how to greet people in different situations - formal and informal contexts.",
+    // Added media property here
+    media: [
+      {
+        type: 'video',
+        url: 'https://www.youtube.com/watch?v=a5uQMwRMHcs&list=RDa5uQMwRMHcs&start_radio=1',
+        placeholder: 'Watch the lesson video',
+        caption: 'Greetings in English and answering "How are you?"'
+      }
+    ],
     keyPoints: [
       "Use 'Hello' and 'Hi' for general greetings",
       "'Good morning/afternoon/evening' are time-specific greetings",
@@ -69,6 +78,15 @@ export const a1_greetings_lessons: Lesson[] = [
     id: "introductions-self",
     title: "Introducing Yourself",
     description: "Learn how to introduce yourself in English, including sharing your name, occupation, and where you're from.",
+    // Added media property here as well
+    media: [
+      {
+        type: 'video',
+        url: 'https://youtu.be/dmOKZLeFKCM',
+        placeholder: 'Watch the lesson video',
+        caption: 'Learn common greetings for introductions'
+      }
+    ],
     keyPoints: [
       "Start with 'My name is...' or 'I'm...' to give your name",
       "Use 'I'm from...' to say where you're from",

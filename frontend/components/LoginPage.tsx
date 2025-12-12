@@ -16,9 +16,10 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import React from "react";
+import { api, setAuthToken } from "../utils/api";
 
 interface LoginPageProps {
-  onLogin: (username: string) => void;
+  onLogin: (username: string, role: string) => void;
   onNavigateToSignUp: () => void;
   onNavigateToHome: () => void;
 }
@@ -29,7 +30,7 @@ export function LoginPage({ onLogin, onNavigateToSignUp, onNavigateToHome }: Log
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!username || !password) {
@@ -39,12 +40,23 @@ export function LoginPage({ onLogin, onNavigateToSignUp, onNavigateToHome }: Log
 
     setIsLoading(true);
     
-    // Simulate login
-    setTimeout(() => {
+    try {
+      const response: any = await api.auth.login({ email: username, password }); // Assuming username input handles email
+      
+      if (response.success && response.token) {
+        setAuthToken(response.token);
+        toast.success(`Welcome back, ${response.data.full_name || response.data.username}! 🎉`);
+        // Pass username and role from backend
+        onLogin(response.data.username, response.data.role || 'user');
+      } else {
+         toast.error(response.error || "Login failed");
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Login failed. Please check your credentials.");
+      console.error(error);
+    } finally {
       setIsLoading(false);
-      toast.success(`Welcome back, ${username}! 🎉`);
-      onLogin(username);
-    }, 1000);
+    }
   };
 
   return (

@@ -4,13 +4,13 @@ import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import type { DifficultyLevel } from "../data/courses";
-import { getTopicByLessonId, getPreviousLesson, getNextLesson } from "../data/courses";
+import { getTopicByLessonId, getCourseByLessonId, getPreviousLesson, getNextLesson } from "../data/courses";
 import { isLessonCompleted, markLessonComplete } from "../utils/progressTracker";
 import { CheckCircle2, Award, ChevronLeft, ChevronRight } from "lucide-react";
 import { LessonMedia } from "./LessonMedia";
 import { MultipleChoiceQuiz } from "./MultipleChoiceQuiz";
 import { CommentSection } from "./CommentSection";
-import React from "react";
+
 
 interface Example {
   sentence: string;
@@ -77,22 +77,32 @@ export function TopicLesson({
     // Track time spent when component unmounts
     return () => {
       if (lessonId) {
-        const timeSpent = Math.floor((Date.now() - startTime) / 60000); // minutes
+        const _timeSpent = Math.floor((Date.now() - startTime) / 60000); // minutes
         // Could call addTimeSpent(lessonId, timeSpent) here if needed
       }
     };
   }, [lessonId, startTime]);
 
-  const handleMarkComplete = () => {
+  const handleMarkComplete = async () => {
     if (lessonId && !completed) {
       const topic = getTopicByLessonId(lessonId);
+      const course = getCourseByLessonId(lessonId); // Need course ID
       
-      if (topic) {
+      if (topic && course) {
         // Extract lesson IDs from the topic's lessons array
         const lessonIds = topic.lessons.map(lesson => lesson.id);
-        markLessonComplete(lessonId, topic.id, lessonIds);
-        setCompleted(true);
-        toast.success("Lesson completed! Great job! 🎉");
+        
+        // Calculate time spent so far
+        const timeSpent = Math.floor((Date.now() - startTime) / 60000);
+
+        try {
+            await markLessonComplete(lessonId, topic.id, lessonIds, course.id, timeSpent);
+            setCompleted(true);
+            toast.success("Lesson completed! Great job! 🎉");
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to save progress");
+        }
       }
     }
   };

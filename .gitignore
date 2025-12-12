@@ -1,3 +1,54 @@
+# Dependencies
 node_modules/
-package-lock.json
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+.vite/
+
+# Environment files (contain secrets)
 .env
+.env.local
+.env.*.local
+backend/.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+
+# IDE and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Test coverage
+coverage/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Deno cache (optional - Deno caches globally by default)
+.deno/
+
+# Docker volumes data (if mounted locally)
+db-data/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
