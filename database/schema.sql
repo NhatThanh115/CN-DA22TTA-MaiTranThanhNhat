@@ -116,6 +116,37 @@ CREATE TABLE user_activity_logs (
     CONSTRAINT fk_activity_log_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+-- ================================================================
+-- LESSON COMMENTS
+-- ================================================================
+
+-- Lesson comments table
+CREATE TABLE lesson_comments (
+    id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    user_id UNIQUEIDENTIFIER NOT NULL,
+    lesson_id NVARCHAR(50) NOT NULL,
+    content NVARCHAR(MAX) NOT NULL,
+    likes_count INT DEFAULT 0,
+    created_at DATETIME2 DEFAULT GETDATE(),
+    updated_at DATETIME2 DEFAULT GETDATE(),
+    CONSTRAINT fk_comment_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Comment likes table (tracks which users liked which comments)
+CREATE TABLE comment_likes (
+    user_id UNIQUEIDENTIFIER NOT NULL,
+    comment_id UNIQUEIDENTIFIER NOT NULL,
+    created_at DATETIME2 DEFAULT GETDATE(),
+    PRIMARY KEY (user_id, comment_id),
+    CONSTRAINT fk_like_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_like_comment FOREIGN KEY (comment_id) REFERENCES lesson_comments(id) ON DELETE NO ACTION
+);
+
+-- Indexes for comments
+CREATE INDEX idx_lesson_comments_lesson_id ON lesson_comments(lesson_id);
+CREATE INDEX idx_lesson_comments_user_id ON lesson_comments(user_id);
+CREATE INDEX idx_lesson_comments_created_at ON lesson_comments(created_at DESC);
+
 -- Learning analytics
 CREATE TABLE learning_analytics (
     id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),

@@ -2,12 +2,20 @@ services:
   db:
     image: mcr.microsoft.com/azure-sql-edge:latest
     user: root
+    restart: unless-stopped
     environment:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=TestPass@123
       - SA_PASSWORD=TestPass@123
+      - MSSQL_MEMORY_LIMIT_MB=512
     ports:
-      - "59751:1433"
+      - "53777:1433"
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
     volumes:
       - db-data:/var/opt/mssql
       - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro

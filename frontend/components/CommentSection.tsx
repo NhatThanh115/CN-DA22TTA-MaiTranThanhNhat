@@ -1,54 +1,137 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { Avatar, AvatarFallback } from "./ui/avatar";
-import { MessageSquare, Flag, ThumbsUp, AlertTriangle } from "lucide-react";
+import { MessageSquare, Flag, ThumbsUp, AlertTriangle, Loader2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import React from "react";
 
 interface Comment {
   id: string;
-  author: string;
+  user_id: string;
+  lesson_id: string;
+  author_name: string;
   content: string;
-  timestamp: string;
-  likes: number;
+  created_at: string;
+  likes_count: number;
+  has_liked?: boolean;
 }
 
-export function CommentSection() {
-  const [comments, setComments] = useState<Comment[]>([
-    {
-      id: "1",
-      author: "Sarah Johnson",
-      content: "This lesson was very helpful! The examples made it easy to understand.",
-      timestamp: "2 hours ago",
-      likes: 12
-    },
-    {
-      id: "2",
-      author: "Mike Chen",
-      content: "Great explanation. Could you add more practice exercises?",
-      timestamp: "1 day ago",
-      likes: 8
-    }
-  ]);
+interface CommentSectionProps {
+  lessonId?: string;
+}
 
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+function getAuthToken(): string | null {
+  return localStorage.getItem("token");
+}
+
+function getCurrentUserId(): string | null {
+  const userStr = localStorage.getItem("tvenglish_user_profile");
+  if (userStr) {
+    try {
+      const user = JSON.parse(userStr);
+      return user.id || null;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+function formatTimeAgo(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  
+  if (seconds < 60) return "Just now";
+  if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
+  if (seconds < 604800) return `${Math.floor(seconds / 86400)} days ago`;
+  return date.toLocaleDateString();
+}
+
+export function CommentSection({ lessonId }: CommentSectionProps) {
+  const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [reportReason, setReportReason] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleAddComment = () => {
-    if (newComment.trim()) {
-      const comment: Comment = {
-        id: Date.now().toString(),
-        author: "You",
-        content: newComment,
-        timestamp: "Just now",
-        likes: 0
-      };
-      setComments([comment, ...comments]);
-      setNewComment("");
-      toast.success("Comment added successfully!");
+  const currentUserId = getCurrentUserId();
+  const isLoggedIn = !!getAuthToken();
+
+  // Fetch comments when lessonId changes
+  useEffect(() => {
+    if (lessonId) {
+      fetchComments();
+    }
+  }, [lessonId]);
+
+  const fetchComments = async () => {
+    if (!lessonId) return;
+    
+    setLoading(true);
+    try {
+      const token = getAuthToken();
+      const headers: HeadersInit = {};
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${API_BASE}/api/comments/${lessonId}`, {
+        headers,
+      });
+
+      const result = await response.json();
+      if (result.success && result.data) {
+        setComments(result.data);
+      }
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddComment = async () => {
+    if (!newComment.trim() || !lessonId) return;
+
+    const token = getAuthToken();
+    if (!token) {
+      toast.error("Please log in to post a comment");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const response = await fetch(`${API_BASE}/api/comments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          lesson_id: lessonId,
+          content: newComment.trim(),
+        }),
+      });
+
+      const result = await response.json();
+      if (result.success && result.data) {
+        setComments([result.data, ...comments]);
+        setNewComment("");
+        toast.success("Comment added successfully!");
+      } else {
+        toast.error(result.error || "Failed to add comment");
+      }
+    } catch (error) {
+      console.error("Error adding comment:", error);
+      toast.error("Failed to add comment");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -60,12 +143,62 @@ export function CommentSection() {
     }
   };
 
-  const handleLike = (id: string) => {
-    setComments(comments.map(comment => 
-      comment.id === id 
-        ? { ...comment, likes: comment.likes + 1 }
-        : comment
-    ));
+  const handleLike = async (commentId: string) => {
+    const token = getAuthToken();
+    if (!token) {
+      toast.error("Please log in to like comments");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE}/api/comments/${commentId}/like`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+
+      const result = await response.json();
+      if (result.success && result.data) {
+        setComments(comments.map(comment =>
+          comment.id === commentId
+            ? { 
+                ...comment, 
+                likes_count: result.data.likes_count,
+                has_liked: result.data.liked 
+              }
+            : comment
+        ));
+      }
+    } catch (error) {
+      console.error("Error toggling like:", error);
+      toast.error("Failed to update like");
+    }
+  };
+
+  const handleDelete = async (commentId: string) => {
+    const token = getAuthToken();
+    if (!token) return;
+
+    try {
+      const response = await fetch(`${API_BASE}/api/comments/${commentId}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setComments(comments.filter(comment => comment.id !== commentId));
+        toast.success("Comment deleted");
+      } else {
+        toast.error(result.error || "Failed to delete comment");
+      }
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      toast.error("Failed to delete comment");
+    }
   };
 
   return (
@@ -128,50 +261,87 @@ export function CommentSection() {
         <Textarea
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Share your thoughts about this lesson..."
+          placeholder={isLoggedIn ? "Share your thoughts about this lesson..." : "Please log in to leave a comment"}
           className="mb-3"
           rows={3}
+          disabled={!isLoggedIn}
         />
         <Button
           onClick={handleAddComment}
-          disabled={!newComment.trim()}
+          disabled={!newComment.trim() || submitting || !isLoggedIn}
           className="bg-[#288f8a] hover:bg-[#236f6b] text-white"
         >
-          Post Comment
+          {submitting ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Posting...
+            </>
+          ) : (
+            "Post Comment"
+          )}
         </Button>
       </Card>
 
       {/* Comments List */}
       <div className="space-y-4">
         <h4>{comments.length} Comment{comments.length !== 1 ? 's' : ''}</h4>
-        {comments.map((comment) => (
-          <Card key={comment.id} className="p-4">
-            <div className="flex gap-3">
-              <Avatar className="w-10 h-10">
-                <AvatarFallback className="bg-[#225d9c] text-white">
-                  {comment.author.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-medium">{comment.author}</span>
-                  <span className="text-sm text-muted-foreground">•</span>
-                  <span className="text-sm text-muted-foreground">{comment.timestamp}</span>
-                </div>
-                <p className="text-sm mb-3">{comment.content}</p>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleLike(comment.id)}
-                  className="h-8 px-2 text-muted-foreground hover:text-primary"
-                >
-                  <ThumbsUp className="w-4 h-4 mr-1" />
-                  {comment.likes > 0 && <span>{comment.likes}</span>}
-                </Button>
-              </div>
-            </div>
+        
+        {loading ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+          </div>
+        ) : comments.length === 0 ? (
+          <Card className="p-6 text-center text-muted-foreground">
+            No comments yet. Be the first to share your thoughts!
           </Card>
-        ))}
+        ) : (
+          comments.map((comment) => (
+            <Card key={comment.id} className="p-4">
+              <div className="flex gap-3">
+                <Avatar className="w-10 h-10">
+                  <AvatarFallback className="bg-[#225d9c] text-white">
+                    {comment.author_name?.charAt(0) || "?"}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-medium">{comment.author_name || "Anonymous"}</span>
+                    <span className="text-sm text-muted-foreground">•</span>
+                    <span className="text-sm text-muted-foreground">
+                      {formatTimeAgo(comment.created_at)}
+                    </span>
+                  </div>
+                  <p className="text-sm mb-3">{comment.content}</p>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleLike(comment.id)}
+                      className={`h-8 px-2 ${
+                        comment.has_liked 
+                          ? "text-primary" 
+                          : "text-muted-foreground hover:text-primary"
+                      }`}
+                    >
+                      <ThumbsUp className={`w-4 h-4 mr-1 ${comment.has_liked ? "fill-current" : ""}`} />
+                      {comment.likes_count > 0 && <span>{comment.likes_count}</span>}
+                    </Button>
+                    {currentUserId && comment.user_id === currentUserId && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(comment.id)}
+                        className="h-8 px-2 text-muted-foreground hover:text-red-600"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </Card>
+          ))
+        )}
       </div>
     </div>
   );

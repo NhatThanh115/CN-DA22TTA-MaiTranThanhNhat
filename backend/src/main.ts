@@ -3,6 +3,7 @@ import { corsMiddleware } from "./middleware/cors.ts";
 import { loggerMiddleware } from "./middleware/logger.ts";
 import progressRoutes from "./routes/progressRoutes.ts";
 import userRoutes from "./routes/userRoutes.ts";
+import commentRoutes from "./routes/commentRoutes.ts";
 
 const app = new Application();
 const PORT = parseInt(Deno.env.get("PORT") || "8000");
@@ -16,6 +17,8 @@ app.use(userRoutes.routes());
 app.use(userRoutes.allowedMethods());
 app.use(progressRoutes.routes());
 app.use(progressRoutes.allowedMethods());
+app.use(commentRoutes.routes());
+app.use(commentRoutes.allowedMethods());
 
 // Health check endpoint
 app.use((ctx) => {
@@ -53,6 +56,11 @@ console.log(`  POST   /api/progress/exercise/submit`);
 console.log(`  POST   /api/progress/quiz/submit`);
 console.log(`  GET    /api/progress/:userId`);
 console.log(`  GET    /api/progress/:userId/stats`);
-console.log(`  GET    /api/progress/:userId/streak\n`);
+console.log(`  GET    /api/progress/:userId/streak`);
+console.log(`  GET    /api/comments/:lessonId`);
+console.log(`  POST   /api/comments`);
+console.log(`  POST   /api/comments/:commentId/like`);
+console.log(`  DELETE /api/comments/:commentId\n`);
 
 await app.listen({ port: PORT });
+

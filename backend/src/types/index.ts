@@ -115,3 +115,27 @@ export interface ApiResponse<T = unknown> {
   data?: T;
   error?: string;
 }
+
+// Comment types
+export interface LessonComment {
+  id: string;
+  user_id: string;
+  lesson_id: string;
+  content: string;
+  likes_count: number;
+  created_at: Date;
+  updated_at: Date;
+  author_name?: string; // Joined from users table
+  has_liked?: boolean; // Whether current user has liked
+}
+
+export interface AddCommentRequest {
+  user_id: string;
+  lesson_id: string;
+  content: string;
+}
+
+export interface LikeCommentRequest {
+  user_id: string;
+  comment_id: string;
+}

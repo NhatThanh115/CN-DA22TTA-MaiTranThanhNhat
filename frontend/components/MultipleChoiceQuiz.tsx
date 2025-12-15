@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { CheckCircle2, XCircle } from "lucide-react";
@@ -22,6 +22,12 @@ export function MultipleChoiceQuiz({
 }: MultipleChoiceQuizProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
+
+  // Reset quiz state when lesson or question changes
+  useEffect(() => {
+    setSelectedAnswer(null);
+    setShowResult(false);
+  }, [lessonId, question]);
 
   const handleSubmit = () => {
     if (selectedAnswer !== null) {

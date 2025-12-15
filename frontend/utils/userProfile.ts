@@ -1,6 +1,7 @@
 // User profile management utility
 
 export interface UserProfile {
+  id?: string;
   username: string;
   email: string;
   role?: 'user' | 'moderator' | 'admin';

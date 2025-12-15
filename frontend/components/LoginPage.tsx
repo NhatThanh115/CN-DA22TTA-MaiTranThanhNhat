@@ -19,7 +19,7 @@ import React from "react";
 import { api, setAuthToken } from "../utils/api";
 
 interface LoginPageProps {
-  onLogin: (username: string, role: string) => void;
+  onLogin: (username: string, role: string, userId: string) => void;
   onNavigateToSignUp: () => void;
   onNavigateToHome: () => void;
 }
@@ -46,8 +46,8 @@ export function LoginPage({ onLogin, onNavigateToSignUp, onNavigateToHome }: Log
       if (response.success && response.token) {
         setAuthToken(response.token);
         toast.success(`Welcome back, ${response.data.full_name || response.data.username}! 🎉`);
-        // Pass username and role from backend
-        onLogin(response.data.username, response.data.role || 'user');
+        // Pass username, role, and id from backend
+        onLogin(response.data.username, response.data.role || 'user', response.data.id);
       } else {
          toast.error(response.error || "Login failed");
       }

@@ -18,7 +18,7 @@ import {
   DialogFooter,
 } from "./ui/dialog";
 import { Badge } from "./ui/badge";
-import { Search, BarChart3, Shield, Ban, CheckCircle, Eye } from "lucide-react";
+import { Search, BarChart3, Shield, Ban, CheckCircle, Eye, Loader2 } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 import { toast } from "sonner";
 
@@ -26,21 +26,30 @@ interface User {
   id: string;
   username: string;
   email: string;
-  role: 'user' | 'moderator' | 'admin';
-  status: 'active' | 'inactive';
-  joinDate: string;
-  lessonsCompleted: number;
-  studyStreak: number;
-  avgScore: number;
+  full_name?: string;
+  role: 'user' | 'moderator' | 'admin' | 'student';
+  is_active: boolean;
+  created_at: string;
+  last_login?: string;
+  lessons_completed: number;
+  study_streak: number;
+  avg_score: number;
 }
 
 interface UserManagementProps {
   currentUser: { username: string; email?: string; role?: string };
 }
 
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+function getAuthToken(): string | null {
+  return localStorage.getItem("token");
+}
+
 export function UserManagement({ currentUser }: UserManagementProps) {
   const { t } = useTranslation();
   const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -48,112 +57,131 @@ export function UserManagement({ currentUser }: UserManagementProps) {
   const [showStatsDialog, setShowStatsDialog] = useState(false);
   const [showRoleDialog, setShowRoleDialog] = useState(false);
 
-  // Load users from localStorage or create mock data
-  useEffect(() => {
-    const storedUsers = localStorage.getItem('adminUsers');
-    if (storedUsers) {
-      setUsers(JSON.parse(storedUsers));
-    } else {
-      // Initialize with mock data
-      const mockUsers: User[] = [
-        {
-          id: '1',
-          username: currentUser.username,
-          email: currentUser.email || 'admin@tvenglish.com',
-          role: 'admin',
-          status: 'active',
-          joinDate: new Date().toISOString(),
-          lessonsCompleted: 45,
-          studyStreak: 12,
-          avgScore: 85
-        },
-        {
-          id: '2',
-          username: 'john_doe',
-          email: 'john@example.com',
-          role: 'user',
-          status: 'active',
-          joinDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-          lessonsCompleted: 23,
-          studyStreak: 5,
-          avgScore: 78
-        },
-        {
-          id: '3',
-          username: 'jane_smith',
-          email: 'jane@example.com',
-          role: 'moderator',
-          status: 'active',
-          joinDate: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
-          lessonsCompleted: 67,
-          studyStreak: 21,
-          avgScore: 92
-        },
-        {
-          id: '4',
-          username: 'bob_wilson',
-          email: 'bob@example.com',
-          role: 'user',
-          status: 'inactive',
-          joinDate: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
-          lessonsCompleted: 12,
-          studyStreak: 0,
-          avgScore: 65
-        }
-      ];
-      setUsers(mockUsers);
-      localStorage.setItem('adminUsers', JSON.stringify(mockUsers));
-    }
-  }, [currentUser]);
+  // Fetch users from API
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        toast.error("Authentication required");
+        setLoading(false);
+        return;
+      }
 
-  // Save users to localStorage whenever they change
-  const saveUsers = (updatedUsers: User[]) => {
-    setUsers(updatedUsers);
-    localStorage.setItem('adminUsers', JSON.stringify(updatedUsers));
+      const response = await fetch(`${API_BASE}/api/users`, {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+
+      const result = await response.json();
+      if (result.success && result.data) {
+        // Map backend fields to frontend format
+        const mappedUsers = result.data.map((u: any) => ({
+          ...u,
+          role: u.role === 'student' ? 'user' : u.role,
+          lessons_completed: u.lessons_completed || 0,
+          study_streak: u.study_streak || 0,
+          avg_score: Math.round(u.avg_score || 0),
+        }));
+        setUsers(mappedUsers);
+      } else {
+        toast.error(result.error || "Failed to load users");
+      }
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      toast.error("Failed to load users");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   // Filter users
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          user.email.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesRole = roleFilter === "all" || user.role === roleFilter;
-    const matchesStatus = statusFilter === "all" || user.status === statusFilter;
+    const matchesStatus = statusFilter === "all" || 
+                         (statusFilter === "active" && user.is_active) ||
+                         (statusFilter === "inactive" && !user.is_active);
     return matchesSearch && matchesRole && matchesStatus;
   });
 
-  // Toggle user status
-  const toggleUserStatus = (userId: string) => {
-    const updatedUsers = users.map(user => {
-      if (user.id === userId) {
-        const newStatus: 'active' | 'inactive' = user.status === 'active' ? 'inactive' : 'active';
+  // Toggle user status via API
+  const toggleUserStatus = async (userId: string) => {
+    const user = users.find(u => u.id === userId);
+    if (!user) return;
+
+    try {
+      const token = getAuthToken();
+      const response = await fetch(`${API_BASE}/api/users/${userId}/status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({ is_active: !user.is_active }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setUsers(users.map(u => 
+          u.id === userId ? { ...u, is_active: !u.is_active } : u
+        ));
         toast.success(
-          newStatus === 'active'
+          !user.is_active
             ? t('admin.users.activated', { username: user.username })
             : t('admin.users.deactivated', { username: user.username })
         );
-        return { ...user, status: newStatus };
+      } else {
+        toast.error(result.error || "Failed to update user status");
       }
-      return user;
-    });
-    saveUsers(updatedUsers);
+    } catch (error) {
+      console.error("Error updating user status:", error);
+      toast.error("Failed to update user status");
+    }
   };
 
-  // Change user role
-  const changeUserRole = (userId: string, newRole: 'user' | 'moderator' | 'admin') => {
+  // Change user role via API
+  const changeUserRole = async (userId: string, newRole: 'user' | 'moderator' | 'admin') => {
     if (currentUser.role !== 'admin') {
       toast.error(t('admin.users.onlyAdminCanChangeRoles'));
       return;
     }
 
-    const updatedUsers = users.map(user => {
-      if (user.id === userId) {
-        toast.success(t('admin.users.roleChanged', { username: user.username, role: t(`admin.roles.${newRole}`) }));
-        return { ...user, role: newRole };
+    try {
+      const token = getAuthToken();
+      // Map frontend "user" role to backend "student" role
+      const backendRole = newRole === 'user' ? 'student' : newRole;
+      
+      const response = await fetch(`${API_BASE}/api/users/${userId}/role`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({ role: backendRole }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        const user = users.find(u => u.id === userId);
+        setUsers(users.map(u => 
+          u.id === userId ? { ...u, role: newRole } : u
+        ));
+        toast.success(t('admin.users.roleChanged', { username: user?.username, role: t(`admin.roles.${newRole}`) }));
+        setShowRoleDialog(false);
+      } else {
+        toast.error(result.error || "Failed to update user role");
       }
-      return user;
-    });
-    saveUsers(updatedUsers);
-    setShowRoleDialog(false);
+    } catch (error) {
+      console.error("Error updating user role:", error);
+      toast.error("Failed to update user role");
+    }
   };
 
   const getRoleBadgeColor = (role: string) => {
@@ -164,8 +192,8 @@ export function UserManagement({ currentUser }: UserManagementProps) {
     }
   };
 
-  const getStatusBadgeColor = (status: string) => {
-    return status === 'active' 
+  const getStatusBadgeColor = (isActive: boolean) => {
+    return isActive 
       ? 'bg-green-100 text-green-700 border-green-300'
       : 'bg-gray-100 text-gray-700 border-gray-300';
   };
@@ -218,7 +246,7 @@ export function UserManagement({ currentUser }: UserManagementProps) {
         </Card>
         <Card className="p-6 border-2 border-green-500">
           <div className="text-sm text-gray-600 mb-1">{t('admin.users.activeUsers')}</div>
-          <div className="text-3xl text-green-600">{users.filter(u => u.status === 'active').length}</div>
+          <div className="text-3xl text-green-600">{users.filter(u => u.is_active).length}</div>
         </Card>
         <Card className="p-6 border-2 border-purple-500">
           <div className="text-sm text-gray-600 mb-1">{t('admin.users.moderators')}</div>
@@ -232,6 +260,12 @@ export function UserManagement({ currentUser }: UserManagementProps) {
 
       {/* Users Table */}
       <Card className="border-2 border-gray-200 overflow-hidden">
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-[#225d9c]" />
+            <span className="ml-2 text-gray-600">Loading users...</span>
+          </div>
+        ) : (
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b-2 border-gray-200">
@@ -276,12 +310,12 @@ export function UserManagement({ currentUser }: UserManagementProps) {
                     </Badge>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <Badge className={`border ${getStatusBadgeColor(user.status)}`}>
-                      {t(`admin.users.${user.status}`)}
+                    <Badge className={`border ${getStatusBadgeColor(user.is_active)}`}>
+                      {t(`admin.users.${user.is_active ? 'active' : 'inactive'}`)}
                     </Badge>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    {user.lessonsCompleted} {t('admin.users.lessons')} • {user.studyStreak} {t('admin.users.dayStreak')}
+                    {user.lessons_completed} {t('admin.users.lessons')} • {user.study_streak} {t('admin.users.dayStreak')}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <div className="flex items-center gap-2">
@@ -314,7 +348,7 @@ export function UserManagement({ currentUser }: UserManagementProps) {
                         onClick={() => toggleUserStatus(user.id)}
                         className="border-2"
                       >
-                        {user.status === 'active' ? (
+                        {user.is_active ? (
                           <Ban className="w-4 h-4 text-red-600" />
                         ) : (
                           <CheckCircle className="w-4 h-4 text-green-600" />
@@ -327,6 +361,7 @@ export function UserManagement({ currentUser }: UserManagementProps) {
             </tbody>
           </table>
         </div>
+        )}
       </Card>
 
       {/* User Statistics Dialog */}
@@ -346,19 +381,19 @@ export function UserManagement({ currentUser }: UserManagementProps) {
               <div className="grid grid-cols-2 gap-4">
                 <Card className="p-4 border-2 border-gray-200">
                   <div className="text-sm text-gray-600 mb-1">{t('admin.users.lessonsCompleted')}</div>
-                  <div className="text-2xl">{selectedUser.lessonsCompleted}</div>
+                  <div className="text-2xl">{selectedUser.lessons_completed}</div>
                 </Card>
                 <Card className="p-4 border-2 border-gray-200">
                   <div className="text-sm text-gray-600 mb-1">{t('admin.users.studyStreak')}</div>
-                  <div className="text-2xl">{selectedUser.studyStreak} {t('admin.users.days')}</div>
+                  <div className="text-2xl">{selectedUser.study_streak} {t('admin.users.days')}</div>
                 </Card>
                 <Card className="p-4 border-2 border-gray-200">
                   <div className="text-sm text-gray-600 mb-1">{t('admin.users.avgScore')}</div>
-                  <div className="text-2xl">{selectedUser.avgScore}%</div>
+                  <div className="text-2xl">{selectedUser.avg_score}%</div>
                 </Card>
                 <Card className="p-4 border-2 border-gray-200">
                   <div className="text-sm text-gray-600 mb-1">{t('admin.users.joinDate')}</div>
-                  <div className="text-sm">{new Date(selectedUser.joinDate).toLocaleDateString()}</div>
+                  <div className="text-sm">{new Date(selectedUser.created_at).toLocaleDateString()}</div>
                 </Card>
               </div>
             </div>

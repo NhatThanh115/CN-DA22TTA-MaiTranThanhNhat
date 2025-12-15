@@ -231,7 +231,7 @@ export function TopicLesson({
       </div>
 
       {/* Comment Section */}
-      <CommentSection />
+      <CommentSection lessonId={lessonId} />
     </div>
   );
 }

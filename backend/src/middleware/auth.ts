@@ -1,14 +1,17 @@
 import { Context, Next } from "@oak/oak";
 import { verify } from "djwt";
 
-const key = await crypto.subtle.generateKey(
-  { name: "HMAC", hash: "SHA-512" },
-  true,
-  ["sign", "verify"],
-);
+// Use a stable secret key from environment variable
+const secret = Deno.env.get("JWT_SECRET") || "your-super-secret-key-change-in-production";
 
-// Export key for signing tokens in controller
-export const jwtKey = key;
+// Create key for JWT signing/verification
+export const jwtKey = await crypto.subtle.importKey(
+  "raw",
+  new TextEncoder().encode(secret),
+  { name: "HMAC", hash: "SHA-512" },
+  false,
+  ["sign", "verify"]
+);
 
 export const authMiddleware = async (ctx: Context, next: Next) => {
   const authHeader = ctx.request.headers.get("Authorization");
@@ -25,7 +28,7 @@ export const authMiddleware = async (ctx: Context, next: Next) => {
   const token = authHeader.split(" ")[1];
 
   try {
-    const payload = await verify(token, key);
+    const payload = await verify(token, jwtKey);
     // Attach user information to context state for downstream use
     ctx.state.user = payload;
     await next();

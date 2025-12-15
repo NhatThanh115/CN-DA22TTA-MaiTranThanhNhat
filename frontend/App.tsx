@@ -118,7 +118,7 @@ export default function App() {
     currentView !== "create-topic" &&
     !isCourseView;
 
-  const handleLogin = (username: string, role: string) => {
+  const handleLogin = (username: string, role: string, userId?: string) => {
     // Set current user for progress tracking
     setCurrentUser(username);
     
@@ -126,13 +126,13 @@ export default function App() {
     const typedRole = (role === 'admin' || role === 'moderator') ? role : 'user' as const;
     setUser({ username, role: typedRole });
     
-    // Update local profile with role from backend
+    // Update local profile with role and id from backend
     const profile = getUserProfile();
     if (!profile) {
-      createUserProfile(username, '', { role: typedRole });
-    } else if (profile.role !== typedRole) {
-      // Update role if it changed
-      createUserProfile(username, profile.email || '', { ...profile, role: typedRole });
+      createUserProfile(username, '', { role: typedRole, id: userId });
+    } else {
+      // Update role and id if they changed
+      createUserProfile(username, profile.email || '', { ...profile, role: typedRole, id: userId });
     }
     setCurrentView("home");
   };

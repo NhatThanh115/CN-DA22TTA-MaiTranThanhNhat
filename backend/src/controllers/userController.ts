@@ -256,3 +256,157 @@ export async function updateUser(
     };
   }
 }
+
+/**
+ * Get all users with roles and progress stats (admin only)
+ */
+export async function getAllUsers(): Promise<ApiResponse<User[]>> {
+  try {
+    const pool = await getPool();
+
+    const result = await pool.request()
+      .query(`
+        SELECT 
+          u.id,
+          u.username,
+          u.email,
+          u.full_name,
+          u.created_at,
+          u.last_login,
+          u.is_active,
+          u.is_verified,
+          ISNULL(r.role_name, 'student') AS role,
+          ISNULL(lp.lessons_completed, 0) AS lessons_completed,
+          ISNULL(us.current_streak, 0) AS study_streak,
+          ISNULL(qs.avg_score, 0) AS avg_score
+        FROM users u
+        LEFT JOIN user_role_assignments ura ON u.id = ura.user_id
+        LEFT JOIN user_roles r ON ura.role_id = r.id
+        LEFT JOIN (
+          SELECT 
+            user_id,
+            COUNT(CASE WHEN status = 'completed' THEN 1 END) AS lessons_completed
+          FROM user_lesson_progress
+          GROUP BY user_id
+        ) lp ON u.id = lp.user_id
+        LEFT JOIN user_streaks us ON u.id = us.user_id
+        LEFT JOIN (
+          SELECT 
+            user_id,
+            AVG(CAST(score AS FLOAT)) AS avg_score
+          FROM user_quiz_scores
+          GROUP BY user_id
+        ) qs ON u.id = qs.user_id
+        ORDER BY u.created_at DESC
+      `);
+
+    return {
+      success: true,
+      data: result.recordset,
+    };
+  } catch (error) {
+    console.error("Error getting all users:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+/**
+ * Update user status (activate/deactivate)
+ */
+export async function updateUserStatus(
+  userId: string,
+  isActive: boolean
+): Promise<ApiResponse<User>> {
+  try {
+    const pool = await getPool();
+
+    await pool.request()
+      .input("user_id", sql.UniqueIdentifier, userId)
+      .input("is_active", sql.Bit, isActive ? 1 : 0)
+      .query(`
+        UPDATE users SET is_active = @is_active, updated_at = GETDATE()
+        WHERE id = @user_id
+      `);
+
+    const result = await pool.request()
+      .input("user_id", sql.UniqueIdentifier, userId)
+      .query(`
+        SELECT id, username, email, full_name, is_active
+        FROM users WHERE id = @user_id
+      `);
+
+    return {
+      success: true,
+      message: isActive ? "User activated" : "User deactivated",
+      data: result.recordset[0],
+    };
+  } catch (error) {
+    console.error("Error updating user status:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+/**
+ * Update user role (admin only)
+ */
+export async function updateUserRole(
+  userId: string,
+  roleName: string
+): Promise<ApiResponse<User>> {
+  try {
+    const pool = await getPool();
+
+    // Get role id
+    const roleResult = await pool.request()
+      .input("role_name", sql.NVarChar(50), roleName)
+      .query(`SELECT id FROM user_roles WHERE role_name = @role_name`);
+
+    if (roleResult.recordset.length === 0) {
+      return {
+        success: false,
+        error: "Invalid role",
+      };
+    }
+
+    const roleId = roleResult.recordset[0].id;
+
+    // Update or insert role assignment
+    await pool.request()
+      .input("user_id", sql.UniqueIdentifier, userId)
+      .input("role_id", sql.Int, roleId)
+      .query(`
+        IF EXISTS (SELECT 1 FROM user_role_assignments WHERE user_id = @user_id)
+          UPDATE user_role_assignments SET role_id = @role_id WHERE user_id = @user_id
+        ELSE
+          INSERT INTO user_role_assignments (user_id, role_id) VALUES (@user_id, @role_id)
+      `);
+
+    const result = await pool.request()
+      .input("user_id", sql.UniqueIdentifier, userId)
+      .query(`
+        SELECT u.id, u.username, r.role_name as role
+        FROM users u
+        LEFT JOIN user_role_assignments ura ON u.id = ura.user_id
+        LEFT JOIN user_roles r ON ura.role_id = r.id
+        WHERE u.id = @user_id
+      `);
+
+    return {
+      success: true,
+      message: "User role updated",
+      data: result.recordset[0],
+    };
+  } catch (error) {
+    console.error("Error updating user role:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
