@@ -1,18 +1,7 @@
 # TVEnglish - Nền tảng Học tiếng Anh
 
-Một nền tảng học tiếng Anh toàn diện được thiết kế dành cho các vùng nông thôn,
+Một nền tảng học tiếng Anh toàn diện được thiết kế dành cho người Khmer ở vùng nông thôn,
 bao gồm các bài học tương tác, nội dung video và theo dõi tiến độ cá nhân hóa.
-
-## 📋 Mục lục
-
-- [Công nghệ sử dụng](#công-nghệ-sử-dụng)
-- [Kiến trúc hệ thống](#kiến-trúc-hệ-thống)
-- [Cài đặt với Docker](#cài-đặt-với-docker)
-- [Cài đặt thủ công](#cài-đặt-thủ-công)
-- [Frontend](#frontend)
-- [Backend](#backend)
-- [Database](#database)
-- [API Endpoints](#api-endpoints)
 
 ---
 
@@ -20,9 +9,9 @@ bao gồm các bài học tương tác, nội dung video và theo dõi tiến đ
 
 | Layer         | Công nghệ                                                         |
 | ------------- | ----------------------------------------------------------------- |
-| **Frontend**  | React 18, TypeScript, Vite, Tailwind CSS, Radix UI, Framer Motion |
+| **Frontend**  | React 18, TypeScript, Vite, CSS                                   |
 | **Backend**   | Deno 2, Oak Framework, JWT Authentication, bcrypt                 |
-| **Database**  | SQL Server / Azure SQL Edge                                       |
+| **Database**  | SQL Server                                                        |
 | **AI**        | Google Generative AI                                              |
 | **Container** | Docker, Docker Compose                                            |
 
@@ -34,7 +23,7 @@ bao gồm các bài học tương tác, nội dung video và theo dõi tiến đ
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
 │    Frontend     │────▶│    Backend      │────▶│    Database     │
 │   (React/Vite)  │     │  (Deno/Oak)     │     │  (SQL Server)   │
-│   Port: 5173    │     │   Port: 8000    │     │   Port: 1433    │
+│   Port: 80      │     │   Port: 8000    │     │   Port: 1433    │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
 ```
 
